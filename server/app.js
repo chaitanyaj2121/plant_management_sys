@@ -51,7 +51,7 @@ app.put("/update_plant/:id", async (req, res) => {
     res.send("Plant updated successfully");
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error occurred while updating");
+    res.send("Error occurred while updating");
   }
 });
 
@@ -64,7 +64,7 @@ app.delete("/delete_plant/:id", async (req, res) => {
     res.send("Plant deleted successfully");
   } catch (err) {
     console.log(err);
-    res.status(500).send("Error occurred while deleting");
+    res.send("Error occurred while deleting");
   }
 });
 
