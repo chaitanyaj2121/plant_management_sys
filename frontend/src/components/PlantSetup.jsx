@@ -1,136 +1,179 @@
-import React, { useState } from "react";
-import PlantForm from "./PlantForm";
-import PlantList from "./PlantList";
+import { useEffect, useState } from "react";
+import api, { getErrorMessage } from "../api/client";
+
+const defaultForm = { name: "", des: "", code: "" };
+const limit = 5;
 
 const PlantSetup = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [plants, setPlants] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [form, setForm] = useState(defaultForm);
+  const [editingId, setEditingId] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handlePlantAdded = () => {
-    setShowModal(false);
-    setRefreshKey((prev) => prev + 1);
+  const fetchPlants = async (targetPage) => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/plants?page=${targetPage}`);
+      setPlants(data.plants || []);
+      setTotalPages(data.totalPages || 1);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlants(page);
+  }, [page]);
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      setSubmitting(true);
+      if (editingId) {
+        await api.put(`/plants/${editingId}`, {
+          name: form.name,
+          des: form.des,
+          code: form.code,
+        });
+      } else {
+        await api.post("/plants", form);
+      }
+      setForm(defaultForm);
+      setEditingId(null);
+      fetchPlants(page);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const onEdit = (plant) => {
+    setEditingId(plant.id);
+    setForm({
+      name: plant.name || "",
+      des: plant.des || "",
+      code: plant.code || "",
+    });
+  };
+
+  const onDelete = async (id) => {
+    try {
+      await api.delete(`/plants/${id}`);
+      fetchPlants(page);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    }
   };
 
   return (
-    <div>
-      {/* Header bar with Add button */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: "60px",
-          borderBottom: "1px solid #ddd",
-          marginBottom: "20px",
-        }}
-      >
-        {/* <p style={{ margin: 0 }}>hello</p> */}
-
-        <form style={{ margin: 0 }} class="max-w-md mx-auto">
-          <label
-            for="search"
-            class="block mb-2.5 text-sm font-medium text-heading sr-only "
-          >
-            Search
-          </label>
-          <div class="relative">
-            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <svg
-                class="w-4 h-4 text-body"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-width="2"
-                  d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"
-                />
-              </svg>
-            </div>
-            <input
-              type="search"
-              id="search"
-              class="block w-full p-3 ps-9 bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand shadow-xs placeholder:text-body"
-              placeholder="Search"
-              required
-            />
+    <div className="space-y-4">
+      <h2 className="text-xl font-semibold">Plant Setup</h2>
+      <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded border p-4 md:grid-cols-4">
+        <input
+          className="rounded border px-3 py-2"
+          placeholder="Plant Name"
+          value={form.name}
+          onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+          required
+        />
+        <input
+          className="rounded border px-3 py-2"
+          placeholder="Description"
+          value={form.des}
+          onChange={(e) => setForm((prev) => ({ ...prev, des: e.target.value }))}
+          required
+        />
+        <input
+          className="rounded border px-3 py-2"
+          placeholder="Code"
+          type="number"
+          value={form.code}
+          onChange={(e) => setForm((prev) => ({ ...prev, code: e.target.value }))}
+          required
+        />
+        <div className="flex gap-2">
+          <button className="rounded bg-blue-600 px-3 py-2 text-white" disabled={submitting} type="submit">
+            {editingId ? "Update" : "Add"}
+          </button>
+          {editingId && (
             <button
+              className="rounded border px-3 py-2"
               type="button"
-              class="absolute end-1.5 bottom-1.5 text-white bg-brand hover:bg-brand-strong box-border border border-transparent focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded text-xs px-3 py-1.5 focus:outline-none"
-            >
-              Search
-            </button>
-          </div>
-        </form>
-
-        <button
-          onClick={() => setShowModal(true)}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#4CAF50",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontSize: "14px",
-          }}
-        >
-          + Add Plant
-        </button>
-      </div>
-
-      {/* Modal */}
-      {showModal && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(0,0,0,0.4)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#fff",
-              padding: "30px",
-              borderRadius: "8px",
-              width: "400px",
-              position: "relative",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
-            }}
-          >
-            <h3 style={{ marginTop: 0 }}>Add Plant</h3>
-            <button
-              onClick={() => setShowModal(false)}
-              style={{
-                position: "absolute",
-                top: "12px",
-                right: "14px",
-                background: "none",
-                border: "none",
-                fontSize: "18px",
-                cursor: "pointer",
+              onClick={() => {
+                setEditingId(null);
+                setForm(defaultForm);
               }}
             >
-              ✕
+              Cancel
             </button>
-            <PlantForm onPlantAdded={handlePlantAdded} />
-          </div>
+          )}
+        </div>
+      </form>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <div className="overflow-x-auto rounded border">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="px-3 py-2 text-left">Name</th>
+                <th className="px-3 py-2 text-left">Description</th>
+                <th className="px-3 py-2 text-left">Code</th>
+                <th className="px-3 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {plants.map((plant) => (
+                <tr key={plant.id} className="border-t">
+                  <td className="px-3 py-2">{plant.name}</td>
+                  <td className="px-3 py-2">{plant.des}</td>
+                  <td className="px-3 py-2">{plant.code}</td>
+                  <td className="px-3 py-2 space-x-2">
+                    <button className="rounded bg-amber-500 px-2 py-1 text-white" onClick={() => onEdit(plant)} type="button">
+                      Edit
+                    </button>
+                    <button className="rounded bg-red-600 px-2 py-1 text-white" onClick={() => onDelete(plant.id)} type="button">
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
-      {/* Plant List */}
-      <PlantList key={refreshKey} />
+      <div className="flex items-center justify-between">
+        <button
+          className="rounded border px-3 py-1 disabled:opacity-50"
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          type="button"
+        >
+          Previous
+        </button>
+        <span>
+          Page {page} of {totalPages}
+        </span>
+        <button
+          className="rounded border px-3 py-1 disabled:opacity-50"
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+          type="button"
+        >
+          Next
+        </button>
+      </div>
     </div>
   );
 };
 
 export default PlantSetup;
+
