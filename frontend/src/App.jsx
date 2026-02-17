@@ -5,14 +5,6 @@ import "./App.css";
 import PlantSetup from "./components/PlantSetup";
 
 const App = () => {
-  const [showModal, setShowModal] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  const handlePlantAdded = (plant) => {
-    setShowModal(false);
-    setRefreshKey((prev) => prev + 1);
-  };
-
   return (
     <Router>
       <div style={{ display: "flex" }}>
