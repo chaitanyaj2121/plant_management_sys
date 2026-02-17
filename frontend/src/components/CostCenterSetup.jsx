@@ -178,6 +178,7 @@ const CostCenterSetup = () => {
                 <th className="px-3 py-2 text-left">Plant</th>
                 <th className="px-3 py-2 text-left">Department</th>
                 <th className="px-3 py-2 text-left">Cost Center</th>
+                <th className="px-3 py-2 text-left">Work Center</th>
                 <th className="px-3 py-2 text-left">Code</th>
                 <th className="px-3 py-2 text-left">Description</th>
                 <th className="px-3 py-2 text-left">Actions</th>
@@ -189,6 +190,11 @@ const CostCenterSetup = () => {
                   <td className="px-3 py-2">{row.plant?.name || "-"}</td>
                   <td className="px-3 py-2">{row.department?.depName || "-"}</td>
                   <td className="px-3 py-2">{row.costCenterName}</td>
+                  <td className="px-3 py-2">
+                    {row.workCenters?.length
+                      ? row.workCenters.map((item) => item.workName).join(", ")
+                      : "-"}
+                  </td>
                   <td className="px-3 py-2">{row.costCenterCode || "-"}</td>
                   <td className="px-3 py-2">{row.description || "-"}</td>
                   <td className="px-3 py-2 space-x-2">

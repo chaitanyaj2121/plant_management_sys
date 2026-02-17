@@ -22,6 +22,7 @@ const getCostCenters = async (limit, offset, filters = {}) => {
     with: {
       plant: true,
       department: true,
+      workCenters: true,
     },
     limit,
     offset,
@@ -45,6 +46,7 @@ const getCostCenterById = async (id) => {
       with: {
         plant: true,
         department: true,
+        workCenters: true,
       },
     })) || null
   );

@@ -159,7 +159,6 @@ const WorkCenterSetup = () => {
               <tr>
                 <th className="px-3 py-2 text-left">Plant</th>
                 <th className="px-3 py-2 text-left">Department</th>
-                <th className="px-3 py-2 text-left">Cost Center</th>
                 <th className="px-3 py-2 text-left">Work Center</th>
                 <th className="px-3 py-2 text-left">Code</th>
                 <th className="px-3 py-2 text-left">Actions</th>
@@ -170,7 +169,6 @@ const WorkCenterSetup = () => {
                 <tr key={row.id} className="border-t">
                   <td className="px-3 py-2">{row.plant?.name || "-"}</td>
                   <td className="px-3 py-2">{row.department?.depName || "-"}</td>
-                  <td className="px-3 py-2">{row.costCenter?.costCenterName || "-"}</td>
                   <td className="px-3 py-2">{row.workName}</td>
                   <td className="px-3 py-2">{row.workCode || "-"}</td>
                   <td className="px-3 py-2 space-x-2">
