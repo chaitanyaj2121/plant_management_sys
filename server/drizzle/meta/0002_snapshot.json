@@ -1,0 +1,367 @@
+{
+  "id": "caf0eb3c-6fd6-464a-bd3a-af5681621f84",
+  "prevId": "8c0bb172-01a3-4407-b93c-566f8edb581e",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.plant": {
+      "name": "plant",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "des": {
+          "name": "des",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "code": {
+          "name": "code",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user": {
+      "name": "user",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_email_unique": {
+          "name": "user_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.department": {
+      "name": "department",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "plant_id": {
+          "name": "plant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dep_name": {
+          "name": "dep_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dep_code": {
+          "name": "dep_code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dep_description": {
+          "name": "dep_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "department_plant_id_plant_id_fk": {
+          "name": "department_plant_id_plant_id_fk",
+          "tableFrom": "department",
+          "tableTo": "plant",
+          "columnsFrom": [
+            "plant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "department_dep_code_unique": {
+          "name": "department_dep_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "dep_code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.cost_center": {
+      "name": "cost_center",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "plant_id": {
+          "name": "plant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dep_id": {
+          "name": "dep_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cost_center_name": {
+          "name": "cost_center_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cost_center_code": {
+          "name": "cost_center_code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "cost_center_plant_id_plant_id_fk": {
+          "name": "cost_center_plant_id_plant_id_fk",
+          "tableFrom": "cost_center",
+          "tableTo": "plant",
+          "columnsFrom": [
+            "plant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "cost_center_dep_id_department_id_fk": {
+          "name": "cost_center_dep_id_department_id_fk",
+          "tableFrom": "cost_center",
+          "tableTo": "department",
+          "columnsFrom": [
+            "dep_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "cost_center_cost_center_code_unique": {
+          "name": "cost_center_cost_center_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cost_center_code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.work_center": {
+      "name": "work_center",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "plant_id": {
+          "name": "plant_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dep_id": {
+          "name": "dep_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cost_center_id": {
+          "name": "cost_center_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "work_name": {
+          "name": "work_name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "work_code": {
+          "name": "work_code",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "work_description": {
+          "name": "work_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "work_center_plant_id_plant_id_fk": {
+          "name": "work_center_plant_id_plant_id_fk",
+          "tableFrom": "work_center",
+          "tableTo": "plant",
+          "columnsFrom": [
+            "plant_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "work_center_dep_id_department_id_fk": {
+          "name": "work_center_dep_id_department_id_fk",
+          "tableFrom": "work_center",
+          "tableTo": "department",
+          "columnsFrom": [
+            "dep_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "work_center_cost_center_id_cost_center_id_fk": {
+          "name": "work_center_cost_center_id_cost_center_id_fk",
+          "tableFrom": "work_center",
+          "tableTo": "cost_center",
+          "columnsFrom": [
+            "cost_center_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "work_center_work_code_unique": {
+          "name": "work_center_work_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "work_code"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

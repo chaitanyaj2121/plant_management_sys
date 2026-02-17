@@ -1,6 +1,6 @@
-const { pgTable, serial, text, varchar } = require("drizzle-orm/pg-core");
 const { drizzle } = require("drizzle-orm/node-postgres");
 const { Client } = require("pg");
+const schema = require("../models/Schema");
 
 const client = new Client({
   host: "localhost",
@@ -19,5 +19,5 @@ client
     console.log("Error Occured", err);
   });
 
-const db = drizzle(client);
+const db = drizzle(client, { schema });
 module.exports = db;
