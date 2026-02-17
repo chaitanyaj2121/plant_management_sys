@@ -48,7 +48,6 @@ const PlantList = () => {
                 key={plant.id}
                 className="flex items-center justify-between bg-white shadow-md rounded-xl p-5 hover:shadow-lg transition duration-300 border border-gray-100"
               >
-                {/* Plant Info */}
                 <div className="space-y-1">
                   <h3 className="text-lg font-semibold text-gray-800">
                     {plant.name}
@@ -59,7 +58,6 @@ const PlantList = () => {
                   </span>
                 </div>
 
-                {/* Delete Button */}
                 <button
                   type="button"
                   onClick={() => handleDelete(plant.id)}
@@ -71,22 +69,29 @@ const PlantList = () => {
             ))}
           </ul>
 
-          <div>
+          <div className="relative flex items-center justify-between w-full mt-4">
+            {/* previous button */}
             <button
               onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="inline-flex items-center text-body bg-neutral-secondary-medium border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading shadow-xs font-medium leading-5 rounded-base text-sm px-3 py-2"
               disabled={currentPage === 1}
             >
               Previous
             </button>
 
-            <span>
-              Page {currentPage} of {totalPages}
+            {/* center text */}
+            <span className="absolute left-1/2 -translate-x-1/2 text-sm text-body">
+              Showing Page{" "}
+              <span className="font-semibold text-heading">{currentPage}</span>{" "}
+              out of{" "}
+              <span className="font-semibold text-heading">{totalPages}</span>
             </span>
 
             <button
               onClick={() =>
                 setCurrentPage((prev) => Math.min(prev + 1, totalPages))
               }
+              className="inline-flex items-center text-body bg-neutral-secondary-medium border border-default-medium hover:bg-neutral-tertiary-medium hover:text-heading shadow-xs font-medium leading-5 rounded-base text-sm px-3 py-2"
               disabled={currentPage === totalPages}
             >
               Next
