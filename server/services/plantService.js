@@ -1,8 +1,19 @@
 const { v4: uuidv4 } = require("uuid");
 const plantFactory = require("../factory/plantFactory");
 
-const getPlants = async () => {
-  return await plantFactory.getAllPlants();
+const getPlants = async (page) => {
+  const limit = 5;
+  const offset = (page - 1) * limit;
+
+  const plants = await plantFactory.getAllPlants(limit, offset);
+  const totalCount = await plantFactory.getTotalPlants();
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return {
+    plants,
+    totalPages,
+  };
 };
 
 const createPlant = async (body) => {

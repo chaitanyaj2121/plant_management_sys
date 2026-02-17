@@ -2,8 +2,13 @@ const db = require("../db/connect_db");
 const { plantSchema } = require("../models/Schema");
 const { eq } = require("drizzle-orm");
 
-const getAllPlants = async () => {
-  return await db.select().from(plantSchema);
+const getAllPlants = async (limit, offset) => {
+  return await db.select().from(plantSchema).limit(limit).offset(offset);
+};
+
+const getTotalPlants = async () => {
+  const result = await db.select().from(plantSchema);
+  return result.length;
 };
 
 const createPlant = async (data) => {
@@ -20,6 +25,7 @@ const deletePlant = async (id) => {
 
 module.exports = {
   getAllPlants,
+  getTotalPlants,
   createPlant,
   updatePlant,
   deletePlant,
