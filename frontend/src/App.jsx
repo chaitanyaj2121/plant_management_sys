@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
-import PlantForm from "./components/PlantForm";
-import PlantList from "./components/PlantList";
+import PlantSetup from "./components/PlantSetup";
 
 const App = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handlePlantAdded = (plant) => {
+    setShowModal(false);
+    setRefreshKey((prev) => prev + 1);
+  };
+
   return (
     <Router>
       <div style={{ display: "flex" }}>
@@ -30,16 +37,7 @@ const App = () => {
 
         <div style={{ flex: 1, padding: "20px" }}>
           <Routes>
-            <Route
-              path="/plant"
-              element={
-                <>
-                  <h2>Plant Setup</h2>
-                  <PlantForm onPlantAdded={() => {}} />
-                  <PlantList />
-                </>
-              }
-            />
+            <Route path="/plant" element={<PlantSetup />} />
             <Route path="/department" element={<div>Department</div>} />
             <Route path="/work-culture" element={<div>Work Culture</div>} />
             <Route path="/cost-center" element={<div>Cost Center</div>} />
