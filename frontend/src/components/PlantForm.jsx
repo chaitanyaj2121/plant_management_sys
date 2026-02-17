@@ -8,6 +8,8 @@ const PlantForm = ({ onPlantAdded }) => {
     code: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -16,6 +18,7 @@ const PlantForm = ({ onPlantAdded }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.post(
         "http://localhost:4000/api/plants",
         formData,
@@ -24,6 +27,8 @@ const PlantForm = ({ onPlantAdded }) => {
       setFormData({ name: "", des: "", code: "" });
     } catch (error) {
       console.error("Error adding plant:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,6 +42,7 @@ const PlantForm = ({ onPlantAdded }) => {
           value={formData.name}
           onChange={handleChange}
           required
+          disabled={loading}
         />
       </div>
       <div>
@@ -47,6 +53,7 @@ const PlantForm = ({ onPlantAdded }) => {
           value={formData.des}
           onChange={handleChange}
           required
+          disabled={loading}
         />
       </div>
       <div>
@@ -57,9 +64,12 @@ const PlantForm = ({ onPlantAdded }) => {
           value={formData.code}
           onChange={handleChange}
           required
+          disabled={loading}
         />
       </div>
-      <button type="submit">Add Plant</button>
+      <button type="submit" disabled={loading}>
+        {loading ? "Adding..." : "Add Plant"}
+      </button>
     </form>
   );
 };
