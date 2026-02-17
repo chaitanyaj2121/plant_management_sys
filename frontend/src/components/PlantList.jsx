@@ -42,7 +42,7 @@ const PlantList = () => {
       {loading && <p>Loading plants...</p>}
       {!loading && (
         <>
-          <ul className="max-w-3xl mx-auto mt-8 space-y-4">
+          <ul className="mx-auto mt-8 space-y-4">
             {plants.map((plant) => (
               <li
                 key={plant.id}
