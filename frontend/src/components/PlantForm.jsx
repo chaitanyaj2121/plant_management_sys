@@ -25,8 +25,10 @@ const PlantForm = ({ onPlantAdded }) => {
       );
       onPlantAdded(response.data);
       setFormData({ name: "", des: "", code: "" });
+      alert("Plant added Successfully!");
     } catch (error) {
       console.error("Error adding plant:", error);
+      alert(error);
     } finally {
       setLoading(false);
     }
