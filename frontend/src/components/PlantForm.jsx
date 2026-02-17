@@ -35,9 +35,12 @@ const PlantForm = ({ onPlantAdded }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-      <div>
-        <label>Name:</label>
+    <form
+      onSubmit={handleSubmit}
+      className="mb-5 space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+    >
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Name:</label>
         <input
           type="text"
           name="name"
@@ -45,10 +48,13 @@ const PlantForm = ({ onPlantAdded }) => {
           onChange={handleChange}
           required
           disabled={loading}
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-200 disabled:cursor-not-allowed disabled:bg-gray-100"
         />
       </div>
-      <div>
-        <label>Description:</label>
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">
+          Description:
+        </label>
         <input
           type="text"
           name="des"
@@ -56,10 +62,11 @@ const PlantForm = ({ onPlantAdded }) => {
           onChange={handleChange}
           required
           disabled={loading}
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-200 disabled:cursor-not-allowed disabled:bg-gray-100"
         />
       </div>
-      <div>
-        <label>Code:</label>
+      <div className="space-y-1">
+        <label className="block text-sm font-medium text-gray-700">Code:</label>
         <input
           type="number"
           name="code"
@@ -67,9 +74,14 @@ const PlantForm = ({ onPlantAdded }) => {
           onChange={handleChange}
           required
           disabled={loading}
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-200 disabled:cursor-not-allowed disabled:bg-gray-100"
         />
       </div>
-      <button type="submit" disabled={loading}>
+      <button
+        type="submit"
+        disabled={loading}
+        className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300"
+      >
         {loading ? "Adding..." : "Add Plant"}
       </button>
     </form>
