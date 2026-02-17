@@ -1,0 +1,46 @@
+const plantService = require("../services/plantService");
+
+const getPlants = async (req, res) => {
+  try {
+    const result = await plantService.getPlants();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const createPlant = async (req, res) => {
+  try {
+    await plantService.createPlant(req.body);
+    res.status(201).json({ message: "Plant added successfully" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+const updatePlant = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await plantService.updatePlant(id, req.body);
+    res.json({ message: "Plant updated successfully" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+const deletePlant = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await plantService.deletePlant(id);
+    res.json({ message: "Plant deleted successfully" });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+module.exports = {
+  getPlants,
+  createPlant,
+  updatePlant,
+  deletePlant,
+};
