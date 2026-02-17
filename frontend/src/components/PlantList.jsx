@@ -31,6 +31,7 @@ const PlantList = () => {
       setLoading(true);
       await axios.delete(`http://localhost:4000/api/plants/${id}`);
       fetchPlants(currentPage);
+      alert("Plant Deleted Successfully!!");
     } catch (error) {
       console.error("Error deleting plant:", error);
       setLoading(false);
