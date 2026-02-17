@@ -43,32 +43,52 @@ const PlantList = () => {
       {loading && <p>Loading plants...</p>}
       {!loading && (
         <>
-          <ul className="mx-auto mt-8 space-y-4">
-            {plants.map((plant) => (
-              <li
-                key={plant.id}
-                className="flex items-center justify-between bg-white shadow-md rounded-xl p-5 hover:shadow-lg transition duration-300 border border-gray-100"
-              >
-                <div className="space-y-1">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {plant.name}
-                  </h3>
-                  <p className="text-sm text-gray-600">{plant.des}</p>
-                  <span className="inline-block text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded-md">
-                    Code: {plant.code}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => handleDelete(plant.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg shadow-md transition duration-300 transform hover:scale-105 active:scale-95"
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="relative overflow-x-auto bg-neutral-primary-soft shadow-xs rounded-base border border-default">
+            <table className="w-full text-sm text-left rtl:text-right text-body">
+              <thead className="text-sm text-body bg-neutral-secondary-soft border-b rounded-base border-default">
+                <tr>
+                  <th scope="col" className="px-6 py-3 font-medium">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 font-medium">
+                    Description
+                  </th>
+                  <th scope="col" className="px-6 py-3 font-medium">
+                    Code
+                  </th>
+                  <th scope="col" className="px-6 py-3 font-medium">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {plants.map((plant) => (
+                  <tr
+                    key={plant.id}
+                    className="bg-neutral-primary border-b border-default"
+                  >
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-heading whitespace-nowrap"
+                    >
+                      {plant.name}
+                    </th>
+                    <td className="px-6 py-4">{plant.des}</td>
+                    <td className="px-6 py-4">{plant.code}</td>
+                    <td className="px-6 py-4">
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(plant.id)}
+                        className="bg-red-500 hover:bg-red-600 text-white font-medium px-4 py-2 rounded-lg shadow-md transition duration-300 transform hover:scale-105 active:scale-95"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           <div className="relative flex items-center justify-between w-full mt-4">
             {/* previous button */}
