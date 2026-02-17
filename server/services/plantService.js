@@ -2,7 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const plantFactory = require("../factory/plantFactory");
 
 const getPlants = async (page) => {
-  const limit = 5;
+  const limit = 4;
   const offset = (page - 1) * limit;
 
   const plants = await plantFactory.getAllPlants(limit, offset);
