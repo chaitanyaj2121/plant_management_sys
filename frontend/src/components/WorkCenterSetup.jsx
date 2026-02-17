@@ -5,7 +5,6 @@ const limit = 5;
 const defaultForm = {
   plantId: "",
   depId: "",
-  costCenterId: "",
   workName: "",
   workCode: "",
   workDescription: "",
@@ -14,7 +13,6 @@ const defaultForm = {
 const WorkCenterSetup = () => {
   const [plants, setPlants] = useState([]);
   const [departments, setDepartments] = useState([]);
-  const [costCenters, setCostCenters] = useState([]);
   const [workCenters, setWorkCenters] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -30,7 +28,6 @@ const WorkCenterSetup = () => {
       const { data } = await api.get(`/work-centers/assignment-data?${params.toString()}`);
       setPlants(data.plants || []);
       setDepartments(data.departments || []);
-      setCostCenters(data.costCenters || []);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -58,27 +55,22 @@ const WorkCenterSetup = () => {
   }, [page]);
 
   const onPlantChange = (plantId) => {
-    setForm((prev) => ({ ...prev, plantId, depId: "", costCenterId: "" }));
+    setForm((prev) => ({ ...prev, plantId, depId: "" }));
     fetchAssignmentData(plantId, "");
   };
 
   const onDepartmentChange = (depId) => {
-    setForm((prev) => ({ ...prev, depId, costCenterId: "" }));
+    setForm((prev) => ({ ...prev, depId }));
     fetchAssignmentData(form.plantId, depId);
   };
 
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
-      const payload = {
-        ...form,
-        costCenterId: form.costCenterId || null,
-      };
-
       if (editingId) {
-        await api.put(`/work-centers/${editingId}`, payload);
+        await api.put(`/work-centers/${editingId}`, form);
       } else {
-        await api.post("/work-centers", payload);
+        await api.post("/work-centers", form);
       }
 
       setEditingId(null);
@@ -95,7 +87,6 @@ const WorkCenterSetup = () => {
     setForm({
       plantId: row.plantId || "",
       depId: row.depId?.toString() || "",
-      costCenterId: row.costCenterId?.toString() || "",
       workName: row.workName || "",
       workCode: row.workCode || "",
       workDescription: row.workDescription || "",
@@ -131,20 +122,6 @@ const WorkCenterSetup = () => {
           {departments.map((department) => (
             <option key={department.id} value={department.id}>
               {department.depName}
-            </option>
-          ))}
-        </select>
-
-        <select
-          className="rounded border px-3 py-2"
-          value={form.costCenterId}
-          onChange={(e) => setForm((prev) => ({ ...prev, costCenterId: e.target.value }))}
-          disabled={!form.depId}
-        >
-          <option value="">Select Cost Center (Optional)</option>
-          {costCenters.map((costCenter) => (
-            <option key={costCenter.id} value={costCenter.id}>
-              {costCenter.costCenterName}
             </option>
           ))}
         </select>
@@ -227,4 +204,3 @@ const WorkCenterSetup = () => {
 };
 
 export default WorkCenterSetup;
-

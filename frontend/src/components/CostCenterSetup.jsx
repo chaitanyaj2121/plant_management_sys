@@ -8,7 +8,7 @@ const defaultForm = {
   costCenterName: "",
   costCenterCode: "",
   description: "",
-  workCenterIds: [],
+  workCenterId: "",
 };
 
 const CostCenterSetup = () => {
@@ -58,29 +58,28 @@ const CostCenterSetup = () => {
   }, [page]);
 
   const onPlantChange = (plantId) => {
-    setForm((prev) => ({ ...prev, plantId, depId: "", workCenterIds: [] }));
+    setForm((prev) => ({ ...prev, plantId, depId: "", workCenterId: "" }));
     fetchAssignmentData(plantId, "");
   };
 
   const onDepartmentChange = (depId) => {
-    setForm((prev) => ({ ...prev, depId, workCenterIds: [] }));
+    setForm((prev) => ({ ...prev, depId, workCenterId: "" }));
     fetchAssignmentData(form.plantId, depId);
-  };
-
-  const onWorkCenterSelection = (event) => {
-    const values = Array.from(event.target.selectedOptions).map((option) =>
-      Number(option.value)
-    );
-    setForm((prev) => ({ ...prev, workCenterIds: values }));
   };
 
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
+      const payload = {
+        ...form,
+        workCenterIds: form.workCenterId ? [Number(form.workCenterId)] : [],
+      };
+      delete payload.workCenterId;
+
       if (editingId) {
-        await api.put(`/cost-centers/${editingId}`, form);
+        await api.put(`/cost-centers/${editingId}`, payload);
       } else {
-        await api.post("/cost-centers", form);
+        await api.post("/cost-centers", payload);
       }
       setEditingId(null);
       setForm(defaultForm);
@@ -99,7 +98,7 @@ const CostCenterSetup = () => {
       costCenterName: row.costCenterName || "",
       costCenterCode: row.costCenterCode || "",
       description: row.description || "",
-      workCenterIds: [],
+      workCenterId: "",
     });
     await fetchAssignmentData(row.plantId, row.depId?.toString() || "");
   };
@@ -140,13 +139,8 @@ const CostCenterSetup = () => {
         <input className="rounded border px-3 py-2" placeholder="Cost Center Code" value={form.costCenterCode} onChange={(e) => setForm((prev) => ({ ...prev, costCenterCode: e.target.value }))} />
         <input className="rounded border px-3 py-2" placeholder="Description" value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} />
 
-        <select
-          multiple
-          className="min-h-28 rounded border px-3 py-2"
-          value={form.workCenterIds.map(String)}
-          onChange={onWorkCenterSelection}
-          disabled={!form.depId}
-        >
+        <select className="rounded border px-3 py-2" value={form.workCenterId} onChange={(e) => setForm((prev) => ({ ...prev, workCenterId: e.target.value }))} disabled={!form.depId}>
+          <option value="">Select Work Center</option>
           {workCenters.map((workCenter) => (
             <option key={workCenter.id} value={workCenter.id}>
               {workCenter.workName}
@@ -173,8 +167,6 @@ const CostCenterSetup = () => {
           )}
         </div>
       </form>
-
-      <p className="text-sm text-gray-600">Hold Ctrl/Cmd to select multiple Work Centers.</p>
 
       {loading ? (
         <p>Loading...</p>
@@ -230,4 +222,3 @@ const CostCenterSetup = () => {
 };
 
 export default CostCenterSetup;
-
