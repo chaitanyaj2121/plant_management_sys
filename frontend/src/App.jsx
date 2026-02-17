@@ -3,29 +3,13 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 
 import PlantSetup from "./components/PlantSetup";
+import Sidebar from "./components/Sidebar";
 
 const App = () => {
   return (
     <Router>
       <div style={{ display: "flex" }}>
-        <div
-          style={{
-            width: "200px",
-            padding: "15px",
-            borderRight: "1px solid #000000",
-            height: "100vh",
-          }}
-        >
-          <h3>Menu</h3>
-          <nav
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
-            <Link to="/plant">Plant</Link>
-            <Link to="/department">Department</Link>
-            <Link to="/work-culture">Work Culture</Link>
-            <Link to="/cost-center">Cost Center</Link>
-          </nav>
-        </div>
+        <Sidebar />
 
         <div style={{ flex: 1, padding: "20px" }}>
           <Routes>
