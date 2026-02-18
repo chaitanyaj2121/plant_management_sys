@@ -132,7 +132,7 @@ const WorkCenterSetup = () => {
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 px-4 pt-14">
           <div className="w-full max-w-4xl rounded border bg-white p-4 shadow-lg">
-            <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            <form onSubmit={onSubmit} className="flex flex-col gap-3">
               <select className="rounded border px-3 py-2" value={form.plantId} onChange={(e) => onPlantChange(e.target.value)} required>
                 <option value="">Select Plant</option>
                 {plants.map((plant) => (
@@ -155,7 +155,7 @@ const WorkCenterSetup = () => {
               <input className="rounded border px-3 py-2" placeholder="Work Center Code" value={form.workCode} onChange={(e) => setForm((prev) => ({ ...prev, workCode: e.target.value }))} />
               <input className="rounded border px-3 py-2" placeholder="Description" value={form.workDescription} onChange={(e) => setForm((prev) => ({ ...prev, workDescription: e.target.value }))} />
 
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-1">
                 <button className="rounded bg-blue-600 px-3 py-2 text-white" type="submit">
                   {editingId ? "Update Workcentre" : "Add Workcentre"}
                 </button>
