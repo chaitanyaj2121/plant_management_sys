@@ -19,6 +19,7 @@ const WorkCenterSetup = () => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const fetchAssignmentData = async (plantId, depId) => {
     try {
@@ -75,6 +76,7 @@ const WorkCenterSetup = () => {
 
       setEditingId(null);
       setForm(defaultForm);
+      setIsFormOpen(false);
       fetchAssignmentData();
       fetchWorkCenters(page);
     } catch (error) {
@@ -92,6 +94,21 @@ const WorkCenterSetup = () => {
       workDescription: row.workDescription || "",
     });
     await fetchAssignmentData(row.plantId, row.depId?.toString() || "");
+    setIsFormOpen(true);
+  };
+
+  const onAdd = () => {
+    setEditingId(null);
+    setForm(defaultForm);
+    fetchAssignmentData();
+    setIsFormOpen(true);
+  };
+
+  const onCloseForm = () => {
+    setEditingId(null);
+    setForm(defaultForm);
+    fetchAssignmentData();
+    setIsFormOpen(false);
   };
 
   const onDelete = async (id) => {
@@ -105,50 +122,51 @@ const WorkCenterSetup = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Work Center Setup</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Work Center Setup</h2>
+        <button className="rounded bg-blue-600 px-3 py-2 text-white" onClick={onAdd} type="button">
+          Add Workcentre
+        </button>
+      </div>
 
-      <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded border p-4 md:grid-cols-3">
-        <select className="rounded border px-3 py-2" value={form.plantId} onChange={(e) => onPlantChange(e.target.value)} required>
-          <option value="">Select Plant</option>
-          {plants.map((plant) => (
-            <option key={plant.id} value={plant.id}>
-              {plant.name}
-            </option>
-          ))}
-        </select>
+      {isFormOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 px-4 pt-14">
+          <div className="w-full max-w-4xl rounded border bg-white p-4 shadow-lg">
+            <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              <select className="rounded border px-3 py-2" value={form.plantId} onChange={(e) => onPlantChange(e.target.value)} required>
+                <option value="">Select Plant</option>
+                {plants.map((plant) => (
+                  <option key={plant.id} value={plant.id}>
+                    {plant.name}
+                  </option>
+                ))}
+              </select>
 
-        <select className="rounded border px-3 py-2" value={form.depId} onChange={(e) => onDepartmentChange(e.target.value)} required disabled={!form.plantId}>
-          <option value="">Select Department</option>
-          {departments.map((department) => (
-            <option key={department.id} value={department.id}>
-              {department.depName}
-            </option>
-          ))}
-        </select>
+              <select className="rounded border px-3 py-2" value={form.depId} onChange={(e) => onDepartmentChange(e.target.value)} required disabled={!form.plantId}>
+                <option value="">Select Department</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.depName}
+                  </option>
+                ))}
+              </select>
 
-        <input className="rounded border px-3 py-2" placeholder="Work Center Name" value={form.workName} onChange={(e) => setForm((prev) => ({ ...prev, workName: e.target.value }))} required />
-        <input className="rounded border px-3 py-2" placeholder="Work Center Code" value={form.workCode} onChange={(e) => setForm((prev) => ({ ...prev, workCode: e.target.value }))} />
-        <input className="rounded border px-3 py-2" placeholder="Description" value={form.workDescription} onChange={(e) => setForm((prev) => ({ ...prev, workDescription: e.target.value }))} />
+              <input className="rounded border px-3 py-2" placeholder="Work Center Name" value={form.workName} onChange={(e) => setForm((prev) => ({ ...prev, workName: e.target.value }))} required />
+              <input className="rounded border px-3 py-2" placeholder="Work Center Code" value={form.workCode} onChange={(e) => setForm((prev) => ({ ...prev, workCode: e.target.value }))} />
+              <input className="rounded border px-3 py-2" placeholder="Description" value={form.workDescription} onChange={(e) => setForm((prev) => ({ ...prev, workDescription: e.target.value }))} />
 
-        <div className="flex gap-2">
-          <button className="rounded bg-blue-600 px-3 py-2 text-white" type="submit">
-            {editingId ? "Update" : "Add"}
-          </button>
-          {editingId && (
-            <button
-              className="rounded border px-3 py-2"
-              type="button"
-              onClick={() => {
-                setEditingId(null);
-                setForm(defaultForm);
-                fetchAssignmentData();
-              }}
-            >
-              Cancel
-            </button>
-          )}
+              <div className="flex gap-2">
+                <button className="rounded bg-blue-600 px-3 py-2 text-white" type="submit">
+                  {editingId ? "Update Workcentre" : "Add Workcentre"}
+                </button>
+                <button className="rounded border px-3 py-2" type="button" onClick={onCloseForm}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
+      )}
 
       {loading ? (
         <p>Loading...</p>

@@ -12,6 +12,7 @@ const PlantSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const fetchPlants = async (targetPage) => {
     try {
@@ -45,6 +46,7 @@ const PlantSetup = () => {
       }
       setForm(defaultForm);
       setEditingId(null);
+      setIsFormOpen(false);
       fetchPlants(page);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -60,6 +62,19 @@ const PlantSetup = () => {
       des: plant.des || "",
       code: plant.code || "",
     });
+    setIsFormOpen(true);
+  };
+
+  const onAdd = () => {
+    setEditingId(null);
+    setForm(defaultForm);
+    setIsFormOpen(true);
+  };
+
+  const onCloseForm = () => {
+    setEditingId(null);
+    setForm(defaultForm);
+    setIsFormOpen(false);
   };
 
   const onDelete = async (id) => {
@@ -73,48 +88,51 @@ const PlantSetup = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Plant Setup</h2>
-      <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded border p-4 md:grid-cols-4">
-        <input
-          className="rounded border px-3 py-2"
-          placeholder="Plant Name"
-          value={form.name}
-          onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-          required
-        />
-        <input
-          className="rounded border px-3 py-2"
-          placeholder="Description"
-          value={form.des}
-          onChange={(e) => setForm((prev) => ({ ...prev, des: e.target.value }))}
-          required
-        />
-        <input
-          className="rounded border px-3 py-2"
-          placeholder="Code"
-          type="number"
-          value={form.code}
-          onChange={(e) => setForm((prev) => ({ ...prev, code: e.target.value }))}
-          required
-        />
-        <div className="flex gap-2">
-          <button className="rounded bg-blue-600 px-3 py-2 text-white" disabled={submitting} type="submit">
-            {editingId ? "Update" : "Add"}
-          </button>
-          {editingId && (
-            <button
-              className="rounded border px-3 py-2"
-              type="button"
-              onClick={() => {
-                setEditingId(null);
-                setForm(defaultForm);
-              }}
-            >
-              Cancel
-            </button>
-          )}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Plant Setup</h2>
+        <button className="rounded bg-blue-600 px-3 py-2 text-white" onClick={onAdd} type="button">
+          Add Plant
+        </button>
+      </div>
+
+      {isFormOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 px-4 pt-14">
+          <div className="w-full max-w-4xl rounded border bg-white p-4 shadow-lg">
+            <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 md:grid-cols-4">
+              <input
+                className="rounded border px-3 py-2"
+                placeholder="Plant Name"
+                value={form.name}
+                onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+                required
+              />
+              <input
+                className="rounded border px-3 py-2"
+                placeholder="Description"
+                value={form.des}
+                onChange={(e) => setForm((prev) => ({ ...prev, des: e.target.value }))}
+                required
+              />
+              <input
+                className="rounded border px-3 py-2"
+                placeholder="Code"
+                type="number"
+                value={form.code}
+                onChange={(e) => setForm((prev) => ({ ...prev, code: e.target.value }))}
+                required
+              />
+              <div className="flex gap-2">
+                <button className="rounded bg-blue-600 px-3 py-2 text-white" disabled={submitting} type="submit">
+                  {editingId ? "Update Plant" : "Add Plant"}
+                </button>
+                <button className="rounded border px-3 py-2" type="button" onClick={onCloseForm}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
+      )}
 
       {loading ? (
         <p>Loading...</p>

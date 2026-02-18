@@ -12,6 +12,7 @@ const DepartmentSetup = () => {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   const fetchAssignmentData = async () => {
     try {
@@ -53,6 +54,7 @@ const DepartmentSetup = () => {
       }
       setForm(defaultForm);
       setEditingId(null);
+      setIsFormOpen(false);
       fetchDepartments(page);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -67,6 +69,19 @@ const DepartmentSetup = () => {
       depCode: department.depCode || "",
       depDescription: department.depDescription || "",
     });
+    setIsFormOpen(true);
+  };
+
+  const onAdd = () => {
+    setEditingId(null);
+    setForm(defaultForm);
+    setIsFormOpen(true);
+  };
+
+  const onCloseForm = () => {
+    setEditingId(null);
+    setForm(defaultForm);
+    setIsFormOpen(false);
   };
 
   const onDelete = async (id) => {
@@ -80,58 +95,61 @@ const DepartmentSetup = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Department Setup</h2>
-      <form onSubmit={submitForm} className="grid grid-cols-1 gap-3 rounded border p-4 md:grid-cols-2">
-        <select
-          className="rounded border px-3 py-2"
-          value={form.plantId}
-          onChange={(e) => setForm((prev) => ({ ...prev, plantId: e.target.value }))}
-          required
-        >
-          <option value="">Select Plant</option>
-          {plants.map((plant) => (
-            <option key={plant.id} value={plant.id}>
-              {plant.name}
-            </option>
-          ))}
-        </select>
-        <input
-          className="rounded border px-3 py-2"
-          placeholder="Department Name"
-          value={form.depName}
-          onChange={(e) => setForm((prev) => ({ ...prev, depName: e.target.value }))}
-          required
-        />
-        <input
-          className="rounded border px-3 py-2"
-          placeholder="Department Code"
-          value={form.depCode}
-          onChange={(e) => setForm((prev) => ({ ...prev, depCode: e.target.value }))}
-        />
-        <input
-          className="rounded border px-3 py-2"
-          placeholder="Description"
-          value={form.depDescription}
-          onChange={(e) => setForm((prev) => ({ ...prev, depDescription: e.target.value }))}
-        />
-        <div className="flex gap-2">
-          <button className="rounded bg-blue-600 px-3 py-2 text-white" type="submit">
-            {editingId ? "Update" : "Add"}
-          </button>
-          {editingId && (
-            <button
-              className="rounded border px-3 py-2"
-              type="button"
-              onClick={() => {
-                setEditingId(null);
-                setForm(defaultForm);
-              }}
-            >
-              Cancel
-            </button>
-          )}
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Department Setup</h2>
+        <button className="rounded bg-blue-600 px-3 py-2 text-white" onClick={onAdd} type="button">
+          Add Department
+        </button>
+      </div>
+
+      {isFormOpen && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 px-4 pt-14">
+          <div className="w-full max-w-4xl rounded border bg-white p-4 shadow-lg">
+            <form onSubmit={submitForm} className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              <select
+                className="rounded border px-3 py-2"
+                value={form.plantId}
+                onChange={(e) => setForm((prev) => ({ ...prev, plantId: e.target.value }))}
+                required
+              >
+                <option value="">Select Plant</option>
+                {plants.map((plant) => (
+                  <option key={plant.id} value={plant.id}>
+                    {plant.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="rounded border px-3 py-2"
+                placeholder="Department Name"
+                value={form.depName}
+                onChange={(e) => setForm((prev) => ({ ...prev, depName: e.target.value }))}
+                required
+              />
+              <input
+                className="rounded border px-3 py-2"
+                placeholder="Department Code"
+                value={form.depCode}
+                onChange={(e) => setForm((prev) => ({ ...prev, depCode: e.target.value }))}
+              />
+              <input
+                className="rounded border px-3 py-2"
+                placeholder="Description"
+                value={form.depDescription}
+                onChange={(e) => setForm((prev) => ({ ...prev, depDescription: e.target.value }))}
+              />
+              <div className="flex gap-2">
+                <button className="rounded bg-blue-600 px-3 py-2 text-white" type="submit">
+                  {editingId ? "Update Department" : "Add Department"}
+                </button>
+                <button className="rounded border px-3 py-2" type="button" onClick={onCloseForm}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </form>
+      )}
 
       {loading ? (
         <p>Loading...</p>
