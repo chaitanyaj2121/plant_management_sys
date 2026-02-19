@@ -17,14 +17,14 @@ const getPlants = async (page) => {
 };
 
 const createPlant = async (body) => {
-  if (!body.name || !body.des || !body.code) {
-    throw new Error("All fields are required");
+  if (!body.name || !body.code) {
+    throw new Error("name and code are required");
   }
 
   const plantData = {
     id: uuidv4(),
     name: body.name,
-    des: body.des,
+    des: body.des || "",
     code: body.code,
   };
 
