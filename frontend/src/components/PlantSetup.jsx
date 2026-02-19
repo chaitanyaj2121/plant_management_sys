@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
 const defaultForm = { name: "", des: "", code: "" };
-const limit = 5;
+const limit = 4;
 
 const PlantSetup = () => {
   const [plants, setPlants] = useState([]);
