@@ -1,10 +1,36 @@
-const { and, eq } = require("drizzle-orm");
+const { and, eq, ilike, or, sql } = require("drizzle-orm");
 const db = require("../db/connect_db");
 const { departmentSchema } = require("../models/Schema");
 
-const getDepartments = async (limit, offset, plantId) => {
+const buildDepartmentWhere = (filters = {}) => {
+  const conditions = [];
+
+  if (filters.plantId) {
+    conditions.push(eq(departmentSchema.plantId, filters.plantId));
+  }
+
+  const search = filters.search?.trim();
+  if (search) {
+    const pattern = `%${search}%`;
+    conditions.push(
+      or(
+        ilike(departmentSchema.depName, pattern),
+        ilike(sql`${departmentSchema.depCode}::text`, pattern),
+        ilike(sql`${departmentSchema.depDescription}::text`, pattern),
+      ),
+    );
+  }
+
+  if (conditions.length === 0) {
+    return undefined;
+  }
+
+  return conditions.length === 1 ? conditions[0] : and(...conditions);
+};
+
+const getDepartments = async (limit, offset, filters = {}) => {
   return db.query.departmentSchema.findMany({
-    where: plantId ? eq(departmentSchema.plantId, plantId) : undefined,
+    where: buildDepartmentWhere(filters),
     with: {
       plant: true,
     },
@@ -13,9 +39,9 @@ const getDepartments = async (limit, offset, plantId) => {
   });
 };
 
-const getTotalDepartments = async (plantId) => {
+const getTotalDepartments = async (filters = {}) => {
   const result = await db.query.departmentSchema.findMany({
-    where: plantId ? eq(departmentSchema.plantId, plantId) : undefined,
+    where: buildDepartmentWhere(filters),
     columns: {
       id: true,
     },

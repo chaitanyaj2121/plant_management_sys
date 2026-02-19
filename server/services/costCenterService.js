@@ -54,6 +54,7 @@ const getCostCenters = async (query) => {
   const filters = {
     plantId: query.plantId,
     depId: query.depId ? Number(query.depId) : undefined,
+    search: query.search,
   };
 
   const costCenters = await costCenterFactory.getCostCenters(limit, offset, filters);

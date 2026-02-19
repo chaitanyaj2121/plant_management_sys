@@ -15,11 +15,12 @@ const DepartmentSetup = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const lastFetchedPage = useRef(null);
+  const lastFetchKey = useRef("");
 
   const fetchAssignmentData = async () => {
     try {
@@ -30,11 +31,12 @@ const DepartmentSetup = () => {
     }
   };
 
-  const fetchDepartments = async (targetPage) => {
+  const fetchDepartments = async (targetPage, targetSearch) => {
     try {
       setLoading(true);
+      const search = targetSearch?.trim() || "";
       const { data } = await api.get(
-        `/departments?page=${targetPage}&limit=${limit}`,
+        `/departments?page=${targetPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
       );
       setDepartments(data.data || []);
       setTotalPages(data.pagination?.totalPages || 1);
@@ -46,12 +48,21 @@ const DepartmentSetup = () => {
   };
 
   useEffect(() => {
-    if (lastFetchedPage.current === page) {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchKey = `${page}|${debouncedSearchTerm.trim()}`;
+    if (lastFetchKey.current === fetchKey) {
       return;
     }
-    lastFetchedPage.current = page;
-    fetchDepartments(page);
-  }, [page]);
+    lastFetchKey.current = fetchKey;
+    fetchDepartments(page, debouncedSearchTerm);
+  }, [page, debouncedSearchTerm]);
 
   const submitForm = async (event) => {
     event.preventDefault();
@@ -66,7 +77,7 @@ const DepartmentSetup = () => {
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
-      fetchDepartments(page);
+      fetchDepartments(page, debouncedSearchTerm);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -100,28 +111,11 @@ const DepartmentSetup = () => {
     try {
       await api.delete(`/departments/${id}`);
       alert("Department deleted successfully");
-      fetchDepartments(page);
+      fetchDepartments(page, debouncedSearchTerm);
     } catch (error) {
       alert(getErrorMessage(error));
     }
   };
-
-  const normalizedSearch = searchTerm.trim().toLowerCase();
-  const filteredDepartments = departments.filter((row) => {
-    if (!normalizedSearch) {
-      return true;
-    }
-    const plantName = (row.plant?.name || "").toLowerCase();
-    const codeCandidates = [
-      row.plant?.code,
-      row.plantCode,
-      row.depCode,
-      row.code,
-    ]
-      .filter((value) => value !== undefined && value !== null)
-      .map((value) => String(value).toLowerCase());
-    return plantName.includes(normalizedSearch) || codeCandidates.some((code) => code.includes(normalizedSearch));
-  });
 
   return (
     <div className="flex min-h-[calc(100vh-40px)] flex-col">
@@ -130,7 +124,10 @@ const DepartmentSetup = () => {
           className="w-96 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           placeholder="Search by plant name or code"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setPage(1);
+            setSearchTerm(e.target.value);
+          }}
         />
         <button
           className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
@@ -237,14 +234,14 @@ const DepartmentSetup = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {filteredDepartments.length === 0 ? (
+              {departments.length === 0 ? (
                 <tr>
                   <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={5}>
                     No matching departments found.
                   </td>
                 </tr>
               ) : (
-                filteredDepartments.map((row) => (
+                departments.map((row) => (
                   <tr key={row.id} className="h-16 hover:bg-gray-50 transition">
                     <td className="px-6 py-4 text-gray-700 font-medium align-middle truncate">
                       {row.plant?.name || row.plantId}

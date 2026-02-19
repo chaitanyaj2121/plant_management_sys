@@ -1,13 +1,43 @@
 const db = require("../db/connect_db");
 const { plantSchema } = require("../models/Schema");
-const { eq } = require("drizzle-orm");
+const { and, eq, ilike, or, sql } = require("drizzle-orm");
 
-const getAllPlants = async (limit, offset) => {
-  return await db.select().from(plantSchema).limit(limit).offset(offset);
+const buildPlantWhere = (filters = {}) => {
+  const conditions = [];
+  const search = filters.search?.trim();
+
+  if (search) {
+    const pattern = `%${search}%`;
+    conditions.push(
+      or(
+        ilike(plantSchema.name, pattern),
+        ilike(sql`${plantSchema.code}::text`, pattern),
+      ),
+    );
+  }
+
+  if (conditions.length === 0) {
+    return undefined;
+  }
+
+  return conditions.length === 1 ? conditions[0] : and(...conditions);
 };
 
-const getTotalPlants = async () => {
-  const result = await db.select().from(plantSchema);
+const getAllPlants = async (limit, offset, filters = {}) => {
+  return await db.query.plantSchema.findMany({
+    where: buildPlantWhere(filters),
+    limit,
+    offset,
+  });
+};
+
+const getTotalPlants = async (filters = {}) => {
+  const result = await db.query.plantSchema.findMany({
+    where: buildPlantWhere(filters),
+    columns: {
+      id: true,
+    },
+  });
   return result.length;
 };
 

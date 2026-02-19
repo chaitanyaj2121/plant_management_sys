@@ -7,9 +7,12 @@ const {
 
 const getPlants = async (query) => {
   const { page, limit, offset } = parsePagination(query);
+  const filters = {
+    search: query.search,
+  };
 
-  const plants = await plantFactory.getAllPlants(limit, offset);
-  const totalCount = await plantFactory.getTotalPlants();
+  const plants = await plantFactory.getAllPlants(limit, offset, filters);
+  const totalCount = await plantFactory.getTotalPlants(filters);
   const pagination = buildPaginationMeta(totalCount, page, limit);
 
   // Keep legacy keys for existing frontend consumers.

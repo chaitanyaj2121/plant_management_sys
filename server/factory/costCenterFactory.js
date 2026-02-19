@@ -1,4 +1,4 @@
-const { and, eq, inArray } = require("drizzle-orm");
+const { and, eq, ilike, inArray, or, sql } = require("drizzle-orm");
 const db = require("../db/connect_db");
 const { costCenterSchema, workCenterSchema } = require("../models/Schema");
 
@@ -9,6 +9,17 @@ const buildCostCenterWhere = (filters = {}) => {
   }
   if (filters.depId) {
     conditions.push(eq(costCenterSchema.depId, filters.depId));
+  }
+  const search = filters.search?.trim();
+  if (search) {
+    const pattern = `%${search}%`;
+    conditions.push(
+      or(
+        ilike(costCenterSchema.costCenterName, pattern),
+        ilike(sql`${costCenterSchema.costCenterCode}::text`, pattern),
+        ilike(sql`${costCenterSchema.description}::text`, pattern),
+      ),
+    );
   }
   if (conditions.length === 0) {
     return undefined;

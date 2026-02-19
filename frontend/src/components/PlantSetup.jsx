@@ -10,17 +10,19 @@ const PlantSetup = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const lastFetchedPage = useRef(null);
+  const lastFetchKey = useRef("");
 
-  const fetchPlants = async (targetPage) => {
+  const fetchPlants = async (targetPage, targetSearch) => {
     try {
       setLoading(true);
+      const search = targetSearch?.trim() || "";
       const { data } = await api.get(
-        `/plants?page=${targetPage}&limit=${limit}`,
+        `/plants?page=${targetPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
       );
       setPlants(data.plants || []);
       setTotalPages(data.totalPages || 1);
@@ -32,12 +34,21 @@ const PlantSetup = () => {
   };
 
   useEffect(() => {
-    if (lastFetchedPage.current === page) {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchKey = `${page}|${debouncedSearchTerm.trim()}`;
+    if (lastFetchKey.current === fetchKey) {
       return;
     }
-    lastFetchedPage.current = page;
-    fetchPlants(page);
-  }, [page]);
+    lastFetchKey.current = fetchKey;
+    fetchPlants(page, debouncedSearchTerm);
+  }, [page, debouncedSearchTerm]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -57,7 +68,7 @@ const PlantSetup = () => {
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
-      fetchPlants(page);
+      fetchPlants(page, debouncedSearchTerm);
     } catch (error) {
       alert(getErrorMessage(error));
     } finally {
@@ -91,24 +102,11 @@ const PlantSetup = () => {
     try {
       await api.delete(`/plants/${id}`);
       alert("Plant deleted successfully");
-      fetchPlants(page);
+      fetchPlants(page, debouncedSearchTerm);
     } catch (error) {
       alert(getErrorMessage(error));
     }
   };
-
-  const normalizedSearch = searchTerm.trim().toLowerCase();
-  const filteredPlants = plants.filter((plant) => {
-    if (!normalizedSearch) {
-      return true;
-    }
-    const plantName = (plant.name || "").toLowerCase();
-    const plantCode = String(plant.code || "").toLowerCase();
-    return (
-      plantName.includes(normalizedSearch) ||
-      plantCode.includes(normalizedSearch)
-    );
-  });
 
   return (
     <div className="flex min-h-[calc(100vh-40px)] flex-col">
@@ -118,7 +116,10 @@ const PlantSetup = () => {
           className="w-96 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           placeholder="Search by plant name or code"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setPage(1);
+            setSearchTerm(e.target.value);
+          }}
         />
         <button
           className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
@@ -223,7 +224,7 @@ const PlantSetup = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredPlants.length === 0 ? (
+              {plants.length === 0 ? (
                 <tr>
                   <td
                     className="px-6 py-5 text-center text-sm text-gray-500"
@@ -233,7 +234,7 @@ const PlantSetup = () => {
                   </td>
                 </tr>
               ) : (
-                filteredPlants.map((plant) => (
+                plants.map((plant) => (
                   <tr
                     key={plant.id}
                     className="h-16 hover:bg-gray-50 transition"

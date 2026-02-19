@@ -7,10 +7,13 @@ const {
 
 const getDepartments = async (query) => {
   const { page, limit, offset } = parsePagination(query);
-  const plantId = query.plantId;
+  const filters = {
+    plantId: query.plantId,
+    search: query.search,
+  };
 
-  const departments = await departmentFactory.getDepartments(limit, offset, plantId);
-  const totalCount = await departmentFactory.getTotalDepartments(plantId);
+  const departments = await departmentFactory.getDepartments(limit, offset, filters);
+  const totalCount = await departmentFactory.getTotalDepartments(filters);
 
   return {
     data: departments,

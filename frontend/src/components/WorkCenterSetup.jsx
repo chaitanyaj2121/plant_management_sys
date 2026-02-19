@@ -17,11 +17,12 @@ const WorkCenterSetup = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const lastFetchedPage = useRef(null);
+  const lastFetchKey = useRef("");
 
   const fetchAssignmentData = async (plantId, depId) => {
     try {
@@ -38,11 +39,12 @@ const WorkCenterSetup = () => {
     }
   };
 
-  const fetchWorkCenters = async (targetPage) => {
+  const fetchWorkCenters = async (targetPage, targetSearch) => {
     try {
       setLoading(true);
+      const search = targetSearch?.trim() || "";
       const { data } = await api.get(
-        `/work-centers?page=${targetPage}&limit=${limit}`,
+        `/work-centers?page=${targetPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
       );
       setWorkCenters(data.data || []);
       setTotalPages(data.pagination?.totalPages || 1);
@@ -54,12 +56,21 @@ const WorkCenterSetup = () => {
   };
 
   useEffect(() => {
-    if (lastFetchedPage.current === page) {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const fetchKey = `${page}|${debouncedSearchTerm.trim()}`;
+    if (lastFetchKey.current === fetchKey) {
       return;
     }
-    lastFetchedPage.current = page;
-    fetchWorkCenters(page);
-  }, [page]);
+    lastFetchKey.current = fetchKey;
+    fetchWorkCenters(page, debouncedSearchTerm);
+  }, [page, debouncedSearchTerm]);
 
   const onPlantChange = (plantId) => {
     setForm((prev) => ({ ...prev, plantId, depId: "" }));
@@ -96,7 +107,7 @@ const WorkCenterSetup = () => {
       setEditingId(null);
       setForm(defaultForm);
       setIsFormOpen(false);
-      fetchWorkCenters(page);
+      fetchWorkCenters(page, debouncedSearchTerm);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -131,28 +142,11 @@ const WorkCenterSetup = () => {
     try {
       await api.delete(`/work-centers/${id}`);
       alert("Work center deleted successfully");
-      fetchWorkCenters(page);
+      fetchWorkCenters(page, debouncedSearchTerm);
     } catch (error) {
       alert(getErrorMessage(error));
     }
   };
-
-  const normalizedSearch = searchTerm.trim().toLowerCase();
-  const filteredWorkCenters = workCenters.filter((row) => {
-    if (!normalizedSearch) {
-      return true;
-    }
-    const plantName = (row.plant?.name || "").toLowerCase();
-    const codeCandidates = [
-      row.plant?.code,
-      row.plantCode,
-      row.workCode,
-      row.code,
-    ]
-      .filter((value) => value !== undefined && value !== null)
-      .map((value) => String(value).toLowerCase());
-    return plantName.includes(normalizedSearch) || codeCandidates.some((code) => code.includes(normalizedSearch));
-  });
 
   return (
     <div className="flex min-h-[calc(100vh-40px)] flex-col">
@@ -161,7 +155,10 @@ const WorkCenterSetup = () => {
           className="w-96 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           placeholder="Search by plant name or code"
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setPage(1);
+            setSearchTerm(e.target.value);
+          }}
         />
         <button
           className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
@@ -282,14 +279,14 @@ const WorkCenterSetup = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {filteredWorkCenters.length === 0 ? (
+              {workCenters.length === 0 ? (
                 <tr>
                   <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={5}>
                     No matching work centers found.
                   </td>
                 </tr>
               ) : (
-                filteredWorkCenters.map((row) => (
+                workCenters.map((row) => (
                   <tr key={row.id} className="h-16 hover:bg-gray-50 transition">
                     <td className="px-6 py-4 text-gray-700 font-medium align-middle truncate">
                       {row.plant?.name || "-"}
@@ -357,3 +354,5 @@ const WorkCenterSetup = () => {
 };
 
 export default WorkCenterSetup;
+
+

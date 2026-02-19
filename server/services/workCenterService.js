@@ -40,6 +40,7 @@ const getWorkCenters = async (query) => {
     plantId: query.plantId,
     depId: query.depId ? Number(query.depId) : undefined,
     costCenterId: query.costCenterId ? Number(query.costCenterId) : undefined,
+    search: query.search,
   };
 
   const workCenters = await workCenterFactory.getWorkCenters(limit, offset, filters);
