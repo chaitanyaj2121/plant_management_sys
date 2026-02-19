@@ -41,7 +41,9 @@ const CostCenterSetup = () => {
 
     try {
       const params = new URLSearchParams({ plantId });
-      const { data } = await api.get(`/cost-centers/departments?${params.toString()}`);
+      const { data } = await api.get(
+        `/cost-centers/departments?${params.toString()}`,
+      );
       setDepartments(data.departments || []);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -56,7 +58,9 @@ const CostCenterSetup = () => {
 
     try {
       const params = new URLSearchParams({ plantId, depId });
-      const { data } = await api.get(`/cost-centers/work-centers?${params.toString()}`);
+      const { data } = await api.get(
+        `/cost-centers/work-centers?${params.toString()}`,
+      );
       setWorkCenters(data.workCenters || []);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -66,7 +70,9 @@ const CostCenterSetup = () => {
   const fetchCostCenters = async (targetPage) => {
     try {
       setLoading(true);
-      const { data } = await api.get(`/cost-centers?page=${targetPage}&limit=${limit}`);
+      const { data } = await api.get(
+        `/cost-centers?page=${targetPage}&limit=${limit}`,
+      );
       setCostCenters(data.data || []);
       setTotalPages(data.pagination?.totalPages || 1);
     } catch (error) {
@@ -177,21 +183,38 @@ const CostCenterSetup = () => {
       alert(getErrorMessage(error));
     }
   };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Cost Center Setup</h2>
-        <button className="rounded bg-blue-600 px-3 py-2 text-white" onClick={onAdd} type="button">
-          Add Cost Centre
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
+            Cost Center Setup
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Manage cost center configuration and assignments
+          </p>
+        </div>
+
+        <button
+          className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          onClick={onAdd}
+          type="button"
+        >
+          + Add Cost Centre
         </button>
       </div>
 
       {isFormOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 px-4 pt-14">
-          <div className="w-full max-w-4xl rounded border bg-white p-4 shadow-lg">
-            <form onSubmit={onSubmit} className="flex flex-col gap-3">
-              <select className="rounded border px-3 py-2" value={form.plantId} onFocus={onPlantDropdownFocus} onChange={(e) => onPlantChange(e.target.value)} required>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
+            <form onSubmit={onSubmit} className="flex flex-col gap-5">
+              <select
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                value={form.plantId}
+                onFocus={onPlantDropdownFocus}
+                onChange={(e) => onPlantChange(e.target.value)}
+                required
+              >
                 <option value="">Select Plant</option>
                 {plants.map((plant) => (
                   <option key={plant.id} value={plant.id}>
@@ -200,7 +223,14 @@ const CostCenterSetup = () => {
                 ))}
               </select>
 
-              <select className="rounded border px-3 py-2" value={form.depId} onFocus={onDepartmentDropdownFocus} onChange={(e) => onDepartmentChange(e.target.value)} required disabled={!form.plantId}>
+              <select
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                value={form.depId}
+                onFocus={onDepartmentDropdownFocus}
+                onChange={(e) => onDepartmentChange(e.target.value)}
+                required
+                disabled={!form.plantId}
+              >
                 <option value="">Select Department</option>
                 {departments.map((department) => (
                   <option key={department.id} value={department.id}>
@@ -209,11 +239,57 @@ const CostCenterSetup = () => {
                 ))}
               </select>
 
-              <input className="rounded border px-3 py-2" placeholder="Cost Center Name" value={form.costCenterName} onChange={(e) => setForm((prev) => ({ ...prev, costCenterName: e.target.value }))} required />
-              <input className="rounded border px-3 py-2" placeholder="Cost Center Code" value={form.costCenterCode} onChange={(e) => setForm((prev) => ({ ...prev, costCenterCode: e.target.value }))} required />
-              <input className="rounded border px-3 py-2" placeholder="Description" value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} />
+              <input
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                placeholder="Cost Center Name"
+                value={form.costCenterName}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    costCenterName: e.target.value,
+                  }))
+                }
+                required
+              />
 
-              <select className="rounded border px-3 py-2" value={form.workCenterId} onFocus={onWorkCenterDropdownFocus} onChange={(e) => setForm((prev) => ({ ...prev, workCenterId: e.target.value }))} disabled={!form.depId} required>
+              <input
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                placeholder="Cost Center Code"
+                value={form.costCenterCode}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    costCenterCode: e.target.value,
+                  }))
+                }
+                required
+              />
+
+              <input
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                placeholder="Description"
+                value={form.description}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+              />
+
+              <select
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                value={form.workCenterId}
+                onFocus={onWorkCenterDropdownFocus}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    workCenterId: e.target.value,
+                  }))
+                }
+                disabled={!form.depId}
+                required
+              >
                 <option value="">Select Work Center</option>
                 {workCenters.map((workCenter) => (
                   <option key={workCenter.id} value={workCenter.id}>
@@ -222,12 +298,20 @@ const CostCenterSetup = () => {
                 ))}
               </select>
 
-              <div className="flex gap-2 pt-1">
-                <button className="rounded bg-blue-600 px-3 py-2 text-white" type="submit">
-                  {editingId ? "Update Cost Centre" : "Add Cost Centre"}
-                </button>
-                <button className="rounded border px-3 py-2" type="button" onClick={onCloseForm}>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 transition"
+                  type="button"
+                  onClick={onCloseForm}
+                >
                   Cancel
+                </button>
+
+                <button
+                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+                  type="submit"
+                >
+                  {editingId ? "Update Cost Centre" : "Add Cost Centre"}
                 </button>
               </div>
             </form>
@@ -236,39 +320,69 @@ const CostCenterSetup = () => {
       )}
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center py-10 text-gray-500">
+          Loading cost centers...
+        </div>
       ) : (
-        <div className="overflow-x-auto rounded border">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100">
+            <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-600">
               <tr>
-                <th className="px-3 py-2 text-left">Plant</th>
-                <th className="px-3 py-2 text-left">Department</th>
-                <th className="px-3 py-2 text-left">Cost Center</th>
-                <th className="px-3 py-2 text-left">Work Center</th>
-                <th className="px-3 py-2 text-left">Code</th>
-                <th className="px-3 py-2 text-left">Description</th>
-                <th className="px-3 py-2 text-left">Actions</th>
+                <th className="px-6 py-3 text-left font-semibold">Plant</th>
+                <th className="px-6 py-3 text-left font-semibold">
+                  Department
+                </th>
+                <th className="px-6 py-3 text-left font-semibold">
+                  Cost Center
+                </th>
+                <th className="px-6 py-3 text-left font-semibold">
+                  Work Center
+                </th>
+                <th className="px-6 py-3 text-left font-semibold">Code</th>
+                <th className="px-6 py-3 text-left font-semibold">
+                  Description
+                </th>
+                <th className="px-6 py-3 text-left font-semibold">Actions</th>
               </tr>
             </thead>
-            <tbody>
+
+            <tbody className="divide-y divide-gray-100">
               {costCenters.map((row) => (
-                <tr key={row.id} className="border-t">
-                  <td className="px-3 py-2">{row.plant?.name || "-"}</td>
-                  <td className="px-3 py-2">{row.department?.depName || "-"}</td>
-                  <td className="px-3 py-2">{row.costCenterName}</td>
-                  <td className="px-3 py-2">
+                <tr key={row.id} className="hover:bg-gray-50 transition">
+                  <td className="px-6 py-4 text-gray-700 font-medium">
+                    {row.plant?.name || "-"}
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {row.department?.depName || "-"}
+                  </td>
+                  <td className="px-6 py-4 text-gray-800 font-medium">
+                    {row.costCenterName}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">
                     {row.workCenters?.length
                       ? row.workCenters.map((item) => item.workName).join(", ")
                       : "-"}
                   </td>
-                  <td className="px-3 py-2">{row.costCenterCode || "-"}</td>
-                  <td className="px-3 py-2">{row.description || "-"}</td>
-                  <td className="px-3 py-2 space-x-2">
-                    <button className="rounded bg-amber-500 px-2 py-1 text-white" onClick={() => onEdit(row)} type="button">
+                  <td className="px-6 py-4 text-gray-600">
+                    {row.costCenterCode || "-"}
+                  </td>
+                  <td className="px-6 py-4 text-gray-600">
+                    {row.description || "-"}
+                  </td>
+                  <td className="px-6 py-4 space-x-2">
+                    <button
+                      className="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-amber-600"
+                      onClick={() => onEdit(row)}
+                      type="button"
+                    >
                       Edit
                     </button>
-                    <button className="rounded bg-red-600 px-2 py-1 text-white" onClick={() => onDelete(row.id)} type="button">
+
+                    <button
+                      className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-red-700"
+                      onClick={() => onDelete(row.id)}
+                      type="button"
+                    >
                       Delete
                     </button>
                   </td>
@@ -279,15 +393,28 @@ const CostCenterSetup = () => {
         </div>
       )}
 
-      <div className="flex items-center justify-between">
-        <button className="rounded border px-3 py-1 disabled:opacity-50" onClick={() => setPage((prev) => Math.max(prev - 1, 1))} disabled={page === 1} type="button">
-          Previous
+      <div className="flex items-center justify-between pt-4">
+        <button
+          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:opacity-50"
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          type="button"
+        >
+          ← Previous
         </button>
-        <span>
-          Page {page} of {totalPages}
+
+        <span className="text-sm text-gray-600">
+          Page <span className="font-semibold">{page}</span> of{" "}
+          <span className="font-semibold">{totalPages}</span>
         </span>
-        <button className="rounded border px-3 py-1 disabled:opacity-50" onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))} disabled={page === totalPages} type="button">
-          Next
+
+        <button
+          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:opacity-50"
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+          type="button"
+        >
+          Next →
         </button>
       </div>
     </div>
