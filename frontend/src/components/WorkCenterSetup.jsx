@@ -106,24 +106,18 @@ const WorkCenterSetup = () => {
       workCode: row.workCode || "",
       workDescription: row.workDescription || "",
     });
-    setPlants([]);
-    setDepartments([]);
     setIsFormOpen(true);
   };
 
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
-    setPlants([]);
-    setDepartments([]);
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
-    setPlants([]);
-    setDepartments([]);
     setIsFormOpen(false);
   };
 

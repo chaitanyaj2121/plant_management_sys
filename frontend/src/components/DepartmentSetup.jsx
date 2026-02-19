@@ -78,14 +78,12 @@ const DepartmentSetup = () => {
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
-    setPlants([]);
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
-    setPlants([]);
     setIsFormOpen(false);
   };
 

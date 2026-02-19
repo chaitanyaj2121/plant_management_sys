@@ -153,27 +153,18 @@ const CostCenterSetup = () => {
       description: row.description || "",
       workCenterId: selectedWorkCenterId,
     });
-    setPlants([]);
-    setDepartments([]);
-    setWorkCenters([]);
     setIsFormOpen(true);
   };
 
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
-    setDepartments([]);
-    setWorkCenters([]);
-    setPlants([]);
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
-    setPlants([]);
-    setDepartments([]);
-    setWorkCenters([]);
     setIsFormOpen(false);
   };
 
