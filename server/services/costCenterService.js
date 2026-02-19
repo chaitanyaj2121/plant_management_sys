@@ -153,10 +153,31 @@ const getCostCenterAssignmentData = async (query) => {
   };
 };
 
+const getCostCenterPlantSelections = async () => {
+  const plants = await plantFactory.getPlantSelections();
+  return { plants };
+};
+
+const getCostCenterDepartmentSelections = async (query) => {
+  const plantId = query.plantId;
+  const departments = await departmentFactory.getDepartmentSelections(plantId);
+  return { departments };
+};
+
+const getCostCenterWorkCenterSelections = async (query) => {
+  const plantId = query.plantId;
+  const depId = query.depId ? Number(query.depId) : undefined;
+  const workCenters = await workCenterFactory.getWorkCenterSelections({ plantId, depId });
+  return { workCenters };
+};
+
 module.exports = {
   getCostCenters,
   createCostCenter,
   updateCostCenter,
   deleteCostCenter,
   getCostCenterAssignmentData,
+  getCostCenterPlantSelections,
+  getCostCenterDepartmentSelections,
+  getCostCenterWorkCenterSelections,
 };

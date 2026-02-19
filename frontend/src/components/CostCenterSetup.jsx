@@ -23,14 +23,39 @@ const CostCenterSetup = () => {
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  const fetchAssignmentData = async (plantId, depId) => {
+  const fetchPlants = async () => {
     try {
-      const params = new URLSearchParams();
-      if (plantId) params.set("plantId", plantId);
-      if (depId) params.set("depId", depId);
-      const { data } = await api.get(`/cost-centers/assignment-data?${params.toString()}`);
+      const { data } = await api.get("/cost-centers/plants");
       setPlants(data.plants || []);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    }
+  };
+
+  const fetchDepartments = async (plantId) => {
+    if (!plantId) {
+      setDepartments([]);
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({ plantId });
+      const { data } = await api.get(`/cost-centers/departments?${params.toString()}`);
       setDepartments(data.departments || []);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    }
+  };
+
+  const fetchWorkCenters = async (plantId, depId) => {
+    if (!plantId || !depId) {
+      setWorkCenters([]);
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({ plantId, depId });
+      const { data } = await api.get(`/cost-centers/work-centers?${params.toString()}`);
       setWorkCenters(data.workCenters || []);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -51,7 +76,7 @@ const CostCenterSetup = () => {
   };
 
   useEffect(() => {
-    fetchAssignmentData();
+    fetchPlants();
   }, []);
 
   useEffect(() => {
@@ -60,12 +85,15 @@ const CostCenterSetup = () => {
 
   const onPlantChange = (plantId) => {
     setForm((prev) => ({ ...prev, plantId, depId: "", workCenterId: "" }));
-    fetchAssignmentData(plantId, "");
+    setDepartments([]);
+    setWorkCenters([]);
+    fetchDepartments(plantId);
   };
 
   const onDepartmentChange = (depId) => {
     setForm((prev) => ({ ...prev, depId, workCenterId: "" }));
-    fetchAssignmentData(form.plantId, depId);
+    setWorkCenters([]);
+    fetchWorkCenters(form.plantId, depId);
   };
 
   const onSubmit = async (event) => {
@@ -85,7 +113,7 @@ const CostCenterSetup = () => {
       setEditingId(null);
       setForm(defaultForm);
       setIsFormOpen(false);
-      fetchAssignmentData();
+      fetchPlants();
       fetchCostCenters(page);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -93,6 +121,10 @@ const CostCenterSetup = () => {
   };
 
   const onEdit = async (row) => {
+    const selectedWorkCenterId = row.workCenters?.length
+      ? row.workCenters[0].id?.toString()
+      : "";
+    await fetchPlants();
     setEditingId(row.id);
     setForm({
       plantId: row.plantId || "",
@@ -100,23 +132,28 @@ const CostCenterSetup = () => {
       costCenterName: row.costCenterName || "",
       costCenterCode: row.costCenterCode || "",
       description: row.description || "",
-      workCenterId: "",
+      workCenterId: selectedWorkCenterId,
     });
-    await fetchAssignmentData(row.plantId, row.depId?.toString() || "");
+    await fetchDepartments(row.plantId);
+    await fetchWorkCenters(row.plantId, row.depId?.toString() || "");
     setIsFormOpen(true);
   };
 
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
-    fetchAssignmentData();
+    setDepartments([]);
+    setWorkCenters([]);
+    fetchPlants();
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
-    fetchAssignmentData();
+    setDepartments([]);
+    setWorkCenters([]);
+    fetchPlants();
     setIsFormOpen(false);
   };
 

@@ -63,6 +63,7 @@ const DepartmentSetup = () => {
 
   const onEdit = (department) => {
     setEditingId(department.id);
+    fetchAssignmentData();
     setForm({
       plantId: department.plantId || "",
       depName: department.depName || "",
@@ -75,6 +76,7 @@ const DepartmentSetup = () => {
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
+    fetchAssignmentData();
     setIsFormOpen(true);
   };
 

@@ -14,11 +14,10 @@ const createCostCenter = async (req, res) => {
     const createdCostCenter = await costCenterService.createCostCenter(
       req.body,
     );
-    res.status(201).json({
+    return res.status(201).json({
       message: "Cost center added successfully",
       costCenterId: createdCostCenter.id,
     });
-    alert("Cost center added successfully");
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -28,8 +27,7 @@ const updateCostCenter = async (req, res) => {
   try {
     const { id } = req.params;
     await costCenterService.updateCostCenter(id, req.body);
-    res.status(200).json({ message: "Cost center updated successfully" });
-    alert("Cost center updated successfully");
+    return res.status(200).json({ message: "Cost center updated successfully" });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -39,8 +37,7 @@ const deleteCostCenter = async (req, res) => {
   try {
     const { id } = req.params;
     await costCenterService.deleteCostCenter(id);
-    res.status(200).json({ message: "Cost center deleted successfully" });
-    alert("Cost center deleted successfully");
+    return res.status(200).json({ message: "Cost center deleted successfully" });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -57,10 +54,44 @@ const getCostCenterAssignmentData = async (req, res) => {
   }
 };
 
+const getCostCenterPlants = async (req, res) => {
+  try {
+    const result = await costCenterService.getCostCenterPlantSelections();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getCostCenterDepartments = async (req, res) => {
+  try {
+    const result = await costCenterService.getCostCenterDepartmentSelections(
+      req.query,
+    );
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getCostCenterWorkCenters = async (req, res) => {
+  try {
+    const result = await costCenterService.getCostCenterWorkCenterSelections(
+      req.query,
+    );
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getCostCenters,
   createCostCenter,
   updateCostCenter,
   deleteCostCenter,
   getCostCenterAssignmentData,
+  getCostCenterPlants,
+  getCostCenterDepartments,
+  getCostCenterWorkCenters,
 };
