@@ -102,7 +102,10 @@ const PlantSetup = () => {
     }
     const plantName = (plant.name || "").toLowerCase();
     const plantCode = String(plant.code || "").toLowerCase();
-    return plantName.includes(normalizedSearch) || plantCode.includes(normalizedSearch);
+    return (
+      plantName.includes(normalizedSearch) ||
+      plantCode.includes(normalizedSearch)
+    );
   });
 
   return (
@@ -123,7 +126,7 @@ const PlantSetup = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button
-            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
             onClick={onAdd}
             type="button"
           >
@@ -132,7 +135,6 @@ const PlantSetup = () => {
         </div>
       </div>
 
-      {/* Modal */}
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl border border-gray-200">
@@ -229,7 +231,10 @@ const PlantSetup = () => {
             <tbody className="divide-y divide-gray-100">
               {filteredPlants.length === 0 ? (
                 <tr>
-                  <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={4}>
+                  <td
+                    className="px-6 py-5 text-center text-sm text-gray-500"
+                    colSpan={4}
+                  >
                     No matching plants found.
                   </td>
                 </tr>
@@ -243,14 +248,15 @@ const PlantSetup = () => {
                     <td className="px-6 py-4 text-gray-600">{plant.code}</td>
                     <td className="px-6 py-4 space-x-2">
                       <button
-                        className="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white hover:bg-amber-600 transition"
+                        className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-100 hover:border-gray-400"
                         onClick={() => onEdit(plant)}
                         type="button"
                       >
                         Edit
                       </button>
+
                       <button
-                        className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 transition"
+                        className="inline-flex items-center rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 hover:border-red-300"
                         onClick={() => onDelete(plant.id)}
                         type="button"
                       >

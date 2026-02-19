@@ -173,7 +173,7 @@ const WorkCenterSetup = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button
-            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
             onClick={onAdd}
             type="button"
           >
@@ -315,7 +315,7 @@ const WorkCenterSetup = () => {
                     </td>
                     <td className="px-6 py-4 space-x-2">
                       <button
-                        className="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-amber-600"
+                        className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-100 hover:border-gray-400"
                         onClick={() => onEdit(row)}
                         type="button"
                       >
@@ -323,7 +323,7 @@ const WorkCenterSetup = () => {
                       </button>
 
                       <button
-                        className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-red-700"
+                        className="inline-flex items-center rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50 hover:border-red-300"
                         onClick={() => onDelete(row.id)}
                         type="button"
                       >
