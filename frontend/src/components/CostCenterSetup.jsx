@@ -206,8 +206,8 @@ const CostCenterSetup = () => {
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="flex min-h-[calc(100vh-40px)] flex-col">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
             Cost Center Setup
@@ -349,11 +349,11 @@ const CostCenterSetup = () => {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-10 text-gray-500">
+        <div className="mb-6 flex justify-center py-10 text-gray-500">
           Loading cost centers...
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div className="mb-6 overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-600">
               <tr>
@@ -430,7 +430,7 @@ const CostCenterSetup = () => {
         </div>
       )}
 
-      <div className="flex items-center justify-between pt-4">
+      <div className="mt-auto flex items-center justify-between pt-4">
         <button
           className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:opacity-50"
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
