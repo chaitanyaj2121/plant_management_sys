@@ -9,6 +9,7 @@ const PlantSetup = () => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -94,6 +95,16 @@ const PlantSetup = () => {
     }
   };
 
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredPlants = plants.filter((plant) => {
+    if (!normalizedSearch) {
+      return true;
+    }
+    const plantName = (plant.name || "").toLowerCase();
+    const plantCode = String(plant.code || "").toLowerCase();
+    return plantName.includes(normalizedSearch) || plantCode.includes(normalizedSearch);
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -104,14 +115,21 @@ const PlantSetup = () => {
             Manage and configure plant details
           </p>
         </div>
-
-        <button
-          className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
-          onClick={onAdd}
-          type="button"
-        >
-          + Add Plant
-        </button>
+        <div className="flex items-center gap-3">
+          <input
+            className="w-72 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            placeholder="Search by plant name or code"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button
+            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700"
+            onClick={onAdd}
+            type="button"
+          >
+            + Add Plant
+          </button>
+        </div>
       </div>
 
       {/* Modal */}
@@ -209,31 +227,39 @@ const PlantSetup = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {plants.map((plant) => (
-                <tr key={plant.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4 font-medium text-gray-800">
-                    {plant.name}
-                  </td>
-                  <td className="px-6 py-4 text-gray-600">{plant.des}</td>
-                  <td className="px-6 py-4 text-gray-600">{plant.code}</td>
-                  <td className="px-6 py-4 space-x-2">
-                    <button
-                      className="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white hover:bg-amber-600 transition"
-                      onClick={() => onEdit(plant)}
-                      type="button"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 transition"
-                      onClick={() => onDelete(plant.id)}
-                      type="button"
-                    >
-                      Delete
-                    </button>
+              {filteredPlants.length === 0 ? (
+                <tr>
+                  <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={4}>
+                    No matching plants found.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredPlants.map((plant) => (
+                  <tr key={plant.id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-medium text-gray-800">
+                      {plant.name}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">{plant.des}</td>
+                    <td className="px-6 py-4 text-gray-600">{plant.code}</td>
+                    <td className="px-6 py-4 space-x-2">
+                      <button
+                        className="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white hover:bg-amber-600 transition"
+                        onClick={() => onEdit(plant)}
+                        type="button"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white hover:bg-red-700 transition"
+                        onClick={() => onDelete(plant.id)}
+                        type="button"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

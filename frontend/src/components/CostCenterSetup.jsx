@@ -18,6 +18,7 @@ const CostCenterSetup = () => {
   const [costCenters, setCostCenters] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
@@ -186,6 +187,24 @@ const CostCenterSetup = () => {
       alert(getErrorMessage(error));
     }
   };
+
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredCostCenters = costCenters.filter((row) => {
+    if (!normalizedSearch) {
+      return true;
+    }
+    const plantName = (row.plant?.name || "").toLowerCase();
+    const codeCandidates = [
+      row.plant?.code,
+      row.plantCode,
+      row.costCenterCode,
+      row.code,
+    ]
+      .filter((value) => value !== undefined && value !== null)
+      .map((value) => String(value).toLowerCase());
+    return plantName.includes(normalizedSearch) || codeCandidates.some((code) => code.includes(normalizedSearch));
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -197,14 +216,21 @@ const CostCenterSetup = () => {
             Manage cost center configuration and assignments
           </p>
         </div>
-
-        <button
-          className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          onClick={onAdd}
-          type="button"
-        >
-          + Add Cost Centre
-        </button>
+        <div className="flex items-center gap-3">
+          <input
+            className="w-72 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            placeholder="Search by plant name or code"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button
+            className="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            onClick={onAdd}
+            type="button"
+          >
+            + Add Cost Centre
+          </button>
+        </div>
       </div>
 
       {isFormOpen && (
@@ -350,47 +376,55 @@ const CostCenterSetup = () => {
             </thead>
 
             <tbody className="divide-y divide-gray-100">
-              {costCenters.map((row) => (
-                <tr key={row.id} className="hover:bg-gray-50 transition">
-                  <td className="px-6 py-4 text-gray-700 font-medium">
-                    {row.plant?.name || "-"}
-                  </td>
-                  <td className="px-6 py-4 text-gray-700">
-                    {row.department?.depName || "-"}
-                  </td>
-                  <td className="px-6 py-4 text-gray-800 font-medium">
-                    {row.costCenterName}
-                  </td>
-                  <td className="px-6 py-4 text-gray-600">
-                    {row.workCenters?.length
-                      ? row.workCenters.map((item) => item.workName).join(", ")
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-4 text-gray-600">
-                    {row.costCenterCode || "-"}
-                  </td>
-                  <td className="px-6 py-4 text-gray-600">
-                    {row.description || "-"}
-                  </td>
-                  <td className="px-6 py-4 space-x-2">
-                    <button
-                      className="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-amber-600"
-                      onClick={() => onEdit(row)}
-                      type="button"
-                    >
-                      Edit
-                    </button>
-
-                    <button
-                      className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-red-700"
-                      onClick={() => onDelete(row.id)}
-                      type="button"
-                    >
-                      Delete
-                    </button>
+              {filteredCostCenters.length === 0 ? (
+                <tr>
+                  <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={7}>
+                    No matching cost centers found.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredCostCenters.map((row) => (
+                  <tr key={row.id} className="hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 text-gray-700 font-medium">
+                      {row.plant?.name || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-gray-700">
+                      {row.department?.depName || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-gray-800 font-medium">
+                      {row.costCenterName}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {row.workCenters?.length
+                        ? row.workCenters.map((item) => item.workName).join(", ")
+                        : "-"}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {row.costCenterCode || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600">
+                      {row.description || "-"}
+                    </td>
+                    <td className="px-6 py-4 space-x-2">
+                      <button
+                        className="rounded-md bg-amber-500 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-amber-600"
+                        onClick={() => onEdit(row)}
+                        type="button"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        className="rounded-md bg-red-600 px-3 py-1 text-xs font-medium text-white shadow-sm transition hover:bg-red-700"
+                        onClick={() => onDelete(row.id)}
+                        type="button"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
