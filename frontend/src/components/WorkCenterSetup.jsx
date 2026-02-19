@@ -68,6 +68,17 @@ const WorkCenterSetup = () => {
     fetchAssignmentData(form.plantId, depId);
   };
 
+  const onPlantDropdownFocus = () => {
+    fetchAssignmentData();
+  };
+
+  const onDepartmentDropdownFocus = () => {
+    if (!form.plantId) {
+      return;
+    }
+    fetchAssignmentData(form.plantId, "");
+  };
+
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -86,7 +97,7 @@ const WorkCenterSetup = () => {
     }
   };
 
-  const onEdit = async (row) => {
+  const onEdit = (row) => {
     setEditingId(row.id);
     setForm({
       plantId: row.plantId || "",
@@ -95,20 +106,24 @@ const WorkCenterSetup = () => {
       workCode: row.workCode || "",
       workDescription: row.workDescription || "",
     });
-    await fetchAssignmentData(row.plantId, row.depId?.toString() || "");
+    setPlants([]);
+    setDepartments([]);
     setIsFormOpen(true);
   };
 
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
-    fetchAssignmentData();
+    setPlants([]);
+    setDepartments([]);
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setPlants([]);
+    setDepartments([]);
     setIsFormOpen(false);
   };
 
@@ -134,7 +149,7 @@ const WorkCenterSetup = () => {
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 px-4 pt-14">
           <div className="w-full max-w-4xl rounded border bg-white p-4 shadow-lg">
             <form onSubmit={onSubmit} className="flex flex-col gap-3">
-              <select className="rounded border px-3 py-2" value={form.plantId} onChange={(e) => onPlantChange(e.target.value)} required>
+              <select className="rounded border px-3 py-2" value={form.plantId} onFocus={onPlantDropdownFocus} onChange={(e) => onPlantChange(e.target.value)} required>
                 <option value="">Select Plant</option>
                 {plants.map((plant) => (
                   <option key={plant.id} value={plant.id}>
@@ -143,7 +158,7 @@ const WorkCenterSetup = () => {
                 ))}
               </select>
 
-              <select className="rounded border px-3 py-2" value={form.depId} onChange={(e) => onDepartmentChange(e.target.value)} required disabled={!form.plantId}>
+              <select className="rounded border px-3 py-2" value={form.depId} onFocus={onDepartmentDropdownFocus} onChange={(e) => onDepartmentChange(e.target.value)} required disabled={!form.plantId}>
                 <option value="">Select Department</option>
                 {departments.map((department) => (
                   <option key={department.id} value={department.id}>

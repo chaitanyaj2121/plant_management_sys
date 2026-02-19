@@ -99,6 +99,24 @@ const CostCenterSetup = () => {
     fetchWorkCenters(form.plantId, depId);
   };
 
+  const onPlantDropdownFocus = () => {
+    fetchPlants();
+  };
+
+  const onDepartmentDropdownFocus = () => {
+    if (!form.plantId) {
+      return;
+    }
+    fetchDepartments(form.plantId);
+  };
+
+  const onWorkCenterDropdownFocus = () => {
+    if (!form.plantId || !form.depId) {
+      return;
+    }
+    fetchWorkCenters(form.plantId, form.depId);
+  };
+
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -122,11 +140,10 @@ const CostCenterSetup = () => {
     }
   };
 
-  const onEdit = async (row) => {
+  const onEdit = (row) => {
     const selectedWorkCenterId = row.workCenters?.length
       ? row.workCenters[0].id?.toString()
       : "";
-    await fetchPlants();
     setEditingId(row.id);
     setForm({
       plantId: row.plantId || "",
@@ -136,8 +153,9 @@ const CostCenterSetup = () => {
       description: row.description || "",
       workCenterId: selectedWorkCenterId,
     });
-    await fetchDepartments(row.plantId);
-    await fetchWorkCenters(row.plantId, row.depId?.toString() || "");
+    setPlants([]);
+    setDepartments([]);
+    setWorkCenters([]);
     setIsFormOpen(true);
   };
 
@@ -146,13 +164,14 @@ const CostCenterSetup = () => {
     setForm(defaultForm);
     setDepartments([]);
     setWorkCenters([]);
-    fetchPlants();
+    setPlants([]);
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setPlants([]);
     setDepartments([]);
     setWorkCenters([]);
     setIsFormOpen(false);
@@ -180,7 +199,7 @@ const CostCenterSetup = () => {
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 px-4 pt-14">
           <div className="w-full max-w-4xl rounded border bg-white p-4 shadow-lg">
             <form onSubmit={onSubmit} className="flex flex-col gap-3">
-              <select className="rounded border px-3 py-2" value={form.plantId} onChange={(e) => onPlantChange(e.target.value)} required>
+              <select className="rounded border px-3 py-2" value={form.plantId} onFocus={onPlantDropdownFocus} onChange={(e) => onPlantChange(e.target.value)} required>
                 <option value="">Select Plant</option>
                 {plants.map((plant) => (
                   <option key={plant.id} value={plant.id}>
@@ -189,7 +208,7 @@ const CostCenterSetup = () => {
                 ))}
               </select>
 
-              <select className="rounded border px-3 py-2" value={form.depId} onChange={(e) => onDepartmentChange(e.target.value)} required disabled={!form.plantId}>
+              <select className="rounded border px-3 py-2" value={form.depId} onFocus={onDepartmentDropdownFocus} onChange={(e) => onDepartmentChange(e.target.value)} required disabled={!form.plantId}>
                 <option value="">Select Department</option>
                 {departments.map((department) => (
                   <option key={department.id} value={department.id}>
@@ -202,7 +221,7 @@ const CostCenterSetup = () => {
               <input className="rounded border px-3 py-2" placeholder="Cost Center Code" value={form.costCenterCode} onChange={(e) => setForm((prev) => ({ ...prev, costCenterCode: e.target.value }))} />
               <input className="rounded border px-3 py-2" placeholder="Description" value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} />
 
-              <select className="rounded border px-3 py-2" value={form.workCenterId} onChange={(e) => setForm((prev) => ({ ...prev, workCenterId: e.target.value }))} disabled={!form.depId}>
+              <select className="rounded border px-3 py-2" value={form.workCenterId} onFocus={onWorkCenterDropdownFocus} onChange={(e) => setForm((prev) => ({ ...prev, workCenterId: e.target.value }))} disabled={!form.depId}>
                 <option value="">Select Work Center</option>
                 {workCenters.map((workCenter) => (
                   <option key={workCenter.id} value={workCenter.id}>

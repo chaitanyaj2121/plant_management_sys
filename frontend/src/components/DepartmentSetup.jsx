@@ -66,7 +66,6 @@ const DepartmentSetup = () => {
 
   const onEdit = (department) => {
     setEditingId(department.id);
-    fetchAssignmentData();
     setForm({
       plantId: department.plantId || "",
       depName: department.depName || "",
@@ -79,13 +78,14 @@ const DepartmentSetup = () => {
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
-    fetchAssignmentData();
+    setPlants([]);
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setPlants([]);
     setIsFormOpen(false);
   };
 
@@ -114,6 +114,7 @@ const DepartmentSetup = () => {
               <select
                 className="rounded border px-3 py-2"
                 value={form.plantId}
+                onFocus={fetchAssignmentData}
                 onChange={(e) => setForm((prev) => ({ ...prev, plantId: e.target.value }))}
                 required
               >
