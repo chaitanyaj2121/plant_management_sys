@@ -21,11 +21,17 @@ const DepartmentSetup = () => {
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const lastFetchKey = useRef("");
+  const hasPlantSelectionsLoaded = useRef(false);
 
-  const fetchPlants = async () => {
+  const fetchPlants = async (force = false) => {
+    if (!force && hasPlantSelectionsLoaded.current) {
+      return;
+    }
+
     try {
       const { data } = await api.get("/plants/selections");
       setPlants(data.plants || []);
+      hasPlantSelectionsLoaded.current = true;
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -93,6 +99,7 @@ const DepartmentSetup = () => {
 
     if (department.plant) {
       setPlants([department.plant]);
+      hasPlantSelectionsLoaded.current = false;
     }
 
     setIsFormOpen(true);
@@ -148,7 +155,7 @@ const DepartmentSetup = () => {
               <select
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                 value={form.plantId}
-                onFocus={fetchPlants}
+                onFocus={() => fetchPlants()}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, plantId: e.target.value }))
                 }

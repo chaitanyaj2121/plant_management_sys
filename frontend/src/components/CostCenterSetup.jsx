@@ -25,19 +25,32 @@ const CostCenterSetup = () => {
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const lastFetchKey = useRef("");
+  const hasPlantSelectionsLoaded = useRef(false);
+  const departmentsLoadedForPlant = useRef("");
+  const workCentersLoadedForKey = useRef("");
 
-  const fetchPlants = async () => {
+  const fetchPlants = async (force = false) => {
+    if (!force && hasPlantSelectionsLoaded.current) {
+      return;
+    }
+
     try {
       const { data } = await api.get("/plants/selections");
       setPlants(data.plants || []);
+      hasPlantSelectionsLoaded.current = true;
     } catch (error) {
       alert(getErrorMessage(error));
     }
   };
 
-  const fetchDepartments = async (plantId) => {
+  const fetchDepartments = async (plantId, force = false) => {
     if (!plantId) {
       setDepartments([]);
+      departmentsLoadedForPlant.current = "";
+      return;
+    }
+
+    if (!force && departmentsLoadedForPlant.current === plantId) {
       return;
     }
 
@@ -47,14 +60,21 @@ const CostCenterSetup = () => {
         `/departments/selections?${params.toString()}`,
       );
       setDepartments(data.departments || []);
+      departmentsLoadedForPlant.current = plantId;
     } catch (error) {
       alert(getErrorMessage(error));
     }
   };
 
-  const fetchWorkCenters = async (plantId, depId) => {
+  const fetchWorkCenters = async (plantId, depId, force = false) => {
     if (!plantId || !depId) {
       setWorkCenters([]);
+      workCentersLoadedForKey.current = "";
+      return;
+    }
+
+    const requestKey = `${plantId}|${depId}`;
+    if (!force && workCentersLoadedForKey.current === requestKey) {
       return;
     }
 
@@ -64,6 +84,7 @@ const CostCenterSetup = () => {
         `/work-centers/selections?${params.toString()}`,
       );
       setWorkCenters(data.workCenters || []);
+      workCentersLoadedForKey.current = requestKey;
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -106,12 +127,15 @@ const CostCenterSetup = () => {
     setForm((prev) => ({ ...prev, plantId, depId: "", workCenterId: "" }));
     setDepartments([]);
     setWorkCenters([]);
+    departmentsLoadedForPlant.current = "";
+    workCentersLoadedForKey.current = "";
     fetchDepartments(plantId);
   };
 
   const onDepartmentChange = (depId) => {
     setForm((prev) => ({ ...prev, depId, workCenterId: "" }));
     setWorkCenters([]);
+    workCentersLoadedForKey.current = "";
     fetchWorkCenters(form.plantId, depId);
   };
 
@@ -171,12 +195,15 @@ const CostCenterSetup = () => {
 
     if (row.plant) {
       setPlants([row.plant]);
+      hasPlantSelectionsLoaded.current = false;
     }
     if (row.department) {
       setDepartments([row.department]);
+      departmentsLoadedForPlant.current = "";
     }
     if (row.workCenters?.length) {
       setWorkCenters(row.workCenters);
+      workCentersLoadedForKey.current = "";
     }
 
     setIsFormOpen(true);

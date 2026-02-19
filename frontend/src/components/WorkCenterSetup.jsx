@@ -23,19 +23,31 @@ const WorkCenterSetup = () => {
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const lastFetchKey = useRef("");
+  const hasPlantSelectionsLoaded = useRef(false);
+  const departmentsLoadedForPlant = useRef("");
 
-  const fetchPlants = async () => {
+  const fetchPlants = async (force = false) => {
+    if (!force && hasPlantSelectionsLoaded.current) {
+      return;
+    }
+
     try {
       const { data } = await api.get("/plants/selections");
       setPlants(data.plants || []);
+      hasPlantSelectionsLoaded.current = true;
     } catch (error) {
       alert(getErrorMessage(error));
     }
   };
 
-  const fetchDepartments = async (plantId) => {
+  const fetchDepartments = async (plantId, force = false) => {
     if (!plantId) {
       setDepartments([]);
+      departmentsLoadedForPlant.current = "";
+      return;
+    }
+
+    if (!force && departmentsLoadedForPlant.current === plantId) {
       return;
     }
 
@@ -45,6 +57,7 @@ const WorkCenterSetup = () => {
         `/departments/selections?${params.toString()}`,
       );
       setDepartments(data.departments || []);
+      departmentsLoadedForPlant.current = plantId;
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -133,9 +146,11 @@ const WorkCenterSetup = () => {
 
     if (row.plant) {
       setPlants([row.plant]);
+      hasPlantSelectionsLoaded.current = false;
     }
     if (row.department) {
       setDepartments([row.department]);
+      departmentsLoadedForPlant.current = "";
     }
 
     setIsFormOpen(true);
