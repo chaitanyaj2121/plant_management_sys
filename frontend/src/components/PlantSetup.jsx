@@ -46,8 +46,10 @@ const PlantSetup = () => {
           des: form.des,
           code: form.code,
         });
+        alert("Plant updated successfully");
       } else {
         await api.post("/plants", form);
+        alert("Plant added successfully");
       }
       setForm(defaultForm);
       setEditingId(null);
@@ -85,6 +87,7 @@ const PlantSetup = () => {
   const onDelete = async (id) => {
     try {
       await api.delete(`/plants/${id}`);
+      alert("Plant deleted successfully");
       fetchPlants(page);
     } catch (error) {
       alert(getErrorMessage(error));

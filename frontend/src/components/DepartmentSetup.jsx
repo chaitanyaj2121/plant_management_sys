@@ -57,8 +57,10 @@ const DepartmentSetup = () => {
     try {
       if (editingId) {
         await api.put(`/departments/${editingId}`, form);
+        alert("Department updated successfully");
       } else {
         await api.post("/departments", form);
+        alert("Department added successfully");
       }
       setForm(defaultForm);
       setEditingId(null);
@@ -96,6 +98,7 @@ const DepartmentSetup = () => {
   const onDelete = async (id) => {
     try {
       await api.delete(`/departments/${id}`);
+      alert("Department deleted successfully");
       fetchDepartments(page);
     } catch (error) {
       alert(getErrorMessage(error));

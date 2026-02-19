@@ -86,8 +86,10 @@ const WorkCenterSetup = () => {
     try {
       if (editingId) {
         await api.put(`/work-centers/${editingId}`, form);
+        alert("Work center updated successfully");
       } else {
         await api.post("/work-centers", form);
+        alert("Work center added successfully");
       }
 
       setEditingId(null);
@@ -127,6 +129,7 @@ const WorkCenterSetup = () => {
   const onDelete = async (id) => {
     try {
       await api.delete(`/work-centers/${id}`);
+      alert("Work center deleted successfully");
       fetchWorkCenters(page);
     } catch (error) {
       alert(getErrorMessage(error));

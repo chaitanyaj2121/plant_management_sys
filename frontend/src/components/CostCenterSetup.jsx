@@ -132,8 +132,10 @@ const CostCenterSetup = () => {
 
       if (editingId) {
         await api.put(`/cost-centers/${editingId}`, payload);
+        alert("Cost center updated successfully");
       } else {
         await api.post("/cost-centers", payload);
+        alert("Cost center added successfully");
       }
       setEditingId(null);
       setForm(defaultForm);
@@ -178,6 +180,7 @@ const CostCenterSetup = () => {
   const onDelete = async (id) => {
     try {
       await api.delete(`/cost-centers/${id}`);
+      alert("Cost center deleted successfully");
       fetchCostCenters(page);
     } catch (error) {
       alert(getErrorMessage(error));
