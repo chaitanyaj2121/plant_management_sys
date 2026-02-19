@@ -82,9 +82,7 @@ const DepartmentSetup = () => {
       alert(getErrorMessage(error));
     }
   };
-
-  const onEdit = async (department) => {
-    await fetchAssignmentData();
+  const onEdit = (department) => {
     setEditingId(department.id);
     setForm({
       plantId: department.plantId || "",
@@ -92,6 +90,11 @@ const DepartmentSetup = () => {
       depCode: department.depCode || "",
       depDescription: department.depDescription || "",
     });
+
+    if (department.plant) {
+      setPlants([department.plant]);
+    }
+
     setIsFormOpen(true);
   };
 
@@ -221,22 +224,31 @@ const DepartmentSetup = () => {
           <table className="w-full table-fixed text-sm">
             <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-600">
               <tr>
-                <th className="w-[20%] px-6 py-3 text-left font-semibold">Plant</th>
+                <th className="w-[20%] px-6 py-3 text-left font-semibold">
+                  Plant
+                </th>
                 <th className="w-[24%] px-6 py-3 text-left font-semibold">
                   Department
                 </th>
-                <th className="w-[13%] px-6 py-3 text-left font-semibold">Code</th>
+                <th className="w-[13%] px-6 py-3 text-left font-semibold">
+                  Code
+                </th>
                 <th className="w-[23%] px-6 py-3 text-left font-semibold">
                   Description
                 </th>
-                <th className="w-[20%] px-6 py-3 text-left font-semibold">Actions</th>
+                <th className="w-[20%] px-6 py-3 text-left font-semibold">
+                  Actions
+                </th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-100">
               {departments.length === 0 ? (
                 <tr>
-                  <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={5}>
+                  <td
+                    className="px-6 py-5 text-center text-sm text-gray-500"
+                    colSpan={5}
+                  >
                     No matching departments found.
                   </td>
                 </tr>
@@ -311,4 +323,3 @@ const DepartmentSetup = () => {
 };
 
 export default DepartmentSetup;
-

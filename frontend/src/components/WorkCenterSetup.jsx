@@ -87,9 +87,7 @@ const WorkCenterSetup = () => {
   };
 
   const onDepartmentDropdownFocus = () => {
-    if (!form.plantId) {
-      return;
-    }
+    if (!form.plantId) return;
     fetchAssignmentData(form.plantId, "");
   };
 
@@ -113,8 +111,7 @@ const WorkCenterSetup = () => {
     }
   };
 
-  const onEdit = async (row) => {
-    await fetchAssignmentData(row.plantId, row.depId?.toString() || "");
+  const onEdit = (row) => {
     setEditingId(row.id);
     setForm({
       plantId: row.plantId || "",
@@ -123,6 +120,14 @@ const WorkCenterSetup = () => {
       workCode: row.workCode || "",
       workDescription: row.workDescription || "",
     });
+
+    if (row.plant) {
+      setPlants([row.plant]);
+    }
+    if (row.department) {
+      setDepartments([row.department]);
+    }
+
     setIsFormOpen(true);
   };
 
@@ -266,22 +271,31 @@ const WorkCenterSetup = () => {
           <table className="w-full table-fixed text-sm">
             <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-600">
               <tr>
-                <th className="w-[20%] px-6 py-3 text-left font-semibold">Plant</th>
+                <th className="w-[20%] px-6 py-3 text-left font-semibold">
+                  Plant
+                </th>
                 <th className="w-[20%] px-6 py-3 text-left font-semibold">
                   Department
                 </th>
                 <th className="w-[24%] px-6 py-3 text-left font-semibold">
                   Work Center
                 </th>
-                <th className="w-[12%] px-6 py-3 text-left font-semibold">Code</th>
-                <th className="w-[24%] px-6 py-3 text-left font-semibold">Actions</th>
+                <th className="w-[12%] px-6 py-3 text-left font-semibold">
+                  Code
+                </th>
+                <th className="w-[24%] px-6 py-3 text-left font-semibold">
+                  Actions
+                </th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-100">
               {workCenters.length === 0 ? (
                 <tr>
-                  <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={5}>
+                  <td
+                    className="px-6 py-5 text-center text-sm text-gray-500"
+                    colSpan={5}
+                  >
                     No matching work centers found.
                   </td>
                 </tr>
@@ -354,6 +368,3 @@ const WorkCenterSetup = () => {
 };
 
 export default WorkCenterSetup;
-
-
-

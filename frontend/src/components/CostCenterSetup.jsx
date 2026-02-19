@@ -115,22 +115,42 @@ const CostCenterSetup = () => {
     fetchWorkCenters(form.plantId, depId);
   };
 
-  const onPlantDropdownFocus = () => {
-    fetchPlants();
+  const onPlantDropdownFocus = async () => {
+    try {
+      const { data } = await api.get("/cost-centers/plants");
+      setPlants(data.plants || []);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    }
   };
 
-  const onDepartmentDropdownFocus = () => {
-    if (!form.plantId) {
-      return;
+  const onDepartmentDropdownFocus = async () => {
+    if (!form.plantId) return;
+    try {
+      const params = new URLSearchParams({ plantId: form.plantId });
+      const { data } = await api.get(
+        `/cost-centers/departments?${params.toString()}`,
+      );
+      setDepartments(data.departments || []);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
-    fetchDepartments(form.plantId);
   };
 
-  const onWorkCenterDropdownFocus = () => {
-    if (!form.plantId || !form.depId) {
-      return;
+  const onWorkCenterDropdownFocus = async () => {
+    if (!form.plantId || !form.depId) return;
+    try {
+      const params = new URLSearchParams({
+        plantId: form.plantId,
+        depId: form.depId,
+      });
+      const { data } = await api.get(
+        `/cost-centers/work-centers?${params.toString()}`,
+      );
+      setWorkCenters(data.workCenters || []);
+    } catch (error) {
+      alert(getErrorMessage(error));
     }
-    fetchWorkCenters(form.plantId, form.depId);
   };
 
   const onSubmit = async (event) => {
@@ -162,9 +182,7 @@ const CostCenterSetup = () => {
     const selectedWorkCenterId = row.workCenters?.length
       ? row.workCenters[0].id?.toString()
       : "";
-    await fetchPlants();
-    await fetchDepartments(row.plantId);
-    await fetchWorkCenters(row.plantId, row.depId?.toString() || "");
+
     setEditingId(row.id);
     setForm({
       plantId: row.plantId || "",
@@ -174,6 +192,17 @@ const CostCenterSetup = () => {
       description: row.description || "",
       workCenterId: selectedWorkCenterId,
     });
+
+    if (row.plant) {
+      setPlants([row.plant]);
+    }
+    if (row.department) {
+      setDepartments([row.department]);
+    }
+    if (row.workCenters?.length) {
+      setWorkCenters(row.workCenters);
+    }
+
     setIsFormOpen(true);
   };
 
@@ -344,7 +373,9 @@ const CostCenterSetup = () => {
           <table className="w-full table-fixed text-sm">
             <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-600">
               <tr>
-                <th className="w-[14%] px-6 py-3 text-left font-semibold">Plant</th>
+                <th className="w-[14%] px-6 py-3 text-left font-semibold">
+                  Plant
+                </th>
                 <th className="w-[14%] px-6 py-3 text-left font-semibold">
                   Department
                 </th>
@@ -354,18 +385,25 @@ const CostCenterSetup = () => {
                 <th className="w-[18%] px-6 py-3 text-left font-semibold">
                   Work Center
                 </th>
-                <th className="w-[10%] px-6 py-3 text-left font-semibold">Code</th>
+                <th className="w-[10%] px-6 py-3 text-left font-semibold">
+                  Code
+                </th>
                 <th className="w-[14%] px-6 py-3 text-left font-semibold">
                   Description
                 </th>
-                <th className="w-[14%] px-6 py-3 text-left font-semibold">Actions</th>
+                <th className="w-[14%] px-6 py-3 text-left font-semibold">
+                  Actions
+                </th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-gray-100">
               {costCenters.length === 0 ? (
                 <tr>
-                  <td className="px-6 py-5 text-center text-sm text-gray-500" colSpan={7}>
+                  <td
+                    className="px-6 py-5 text-center text-sm text-gray-500"
+                    colSpan={7}
+                  >
                     No matching cost centers found.
                   </td>
                 </tr>
@@ -386,12 +424,16 @@ const CostCenterSetup = () => {
                         className="truncate"
                         title={
                           row.workCenters?.length
-                            ? row.workCenters.map((item) => item.workName).join(", ")
+                            ? row.workCenters
+                                .map((item) => item.workName)
+                                .join(", ")
                             : "-"
                         }
                       >
                         {row.workCenters?.length
-                          ? row.workCenters.map((item) => item.workName).join(", ")
+                          ? row.workCenters
+                              .map((item) => item.workName)
+                              .join(", ")
                           : "-"}
                       </p>
                     </td>
@@ -457,5 +499,3 @@ const CostCenterSetup = () => {
 };
 
 export default CostCenterSetup;
-
-
