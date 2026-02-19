@@ -13,7 +13,7 @@ const DepartmentSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const hasLoadedInitialPage = useRef(false);
+  const lastFetchedPage = useRef(null);
 
   const fetchAssignmentData = async () => {
     try {
@@ -38,12 +38,10 @@ const DepartmentSetup = () => {
   };
 
   useEffect(() => {
-    if (page === 1 && hasLoadedInitialPage.current) {
+    if (lastFetchedPage.current === page) {
       return;
     }
-    if (page === 1) {
-      hasLoadedInitialPage.current = true;
-    }
+    lastFetchedPage.current = page;
     fetchDepartments(page);
   }, [page]);
 

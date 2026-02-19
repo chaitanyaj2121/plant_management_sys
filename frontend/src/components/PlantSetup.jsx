@@ -13,7 +13,7 @@ const PlantSetup = () => {
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const hasLoadedInitialPage = useRef(false);
+  const lastFetchedPage = useRef(null);
 
   const fetchPlants = async (targetPage) => {
     try {
@@ -29,12 +29,10 @@ const PlantSetup = () => {
   };
 
   useEffect(() => {
-    if (page === 1 && hasLoadedInitialPage.current) {
+    if (lastFetchedPage.current === page) {
       return;
     }
-    if (page === 1) {
-      hasLoadedInitialPage.current = true;
-    }
+    lastFetchedPage.current = page;
     fetchPlants(page);
   }, [page]);
 

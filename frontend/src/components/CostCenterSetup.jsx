@@ -22,7 +22,7 @@ const CostCenterSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const hasLoadedInitialPage = useRef(false);
+  const lastFetchedPage = useRef(null);
 
   const fetchPlants = async () => {
     try {
@@ -77,12 +77,10 @@ const CostCenterSetup = () => {
   };
 
   useEffect(() => {
-    if (page === 1 && hasLoadedInitialPage.current) {
+    if (lastFetchedPage.current === page) {
       return;
     }
-    if (page === 1) {
-      hasLoadedInitialPage.current = true;
-    }
+    lastFetchedPage.current = page;
     fetchCostCenters(page);
   }, [page]);
 
