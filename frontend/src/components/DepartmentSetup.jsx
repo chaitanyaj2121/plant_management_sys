@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
 const limit = 5;
@@ -13,6 +13,7 @@ const DepartmentSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const hasLoadedInitialPage = useRef(false);
 
   const fetchAssignmentData = async () => {
     try {
@@ -37,10 +38,12 @@ const DepartmentSetup = () => {
   };
 
   useEffect(() => {
-    fetchAssignmentData();
-  }, []);
-
-  useEffect(() => {
+    if (page === 1 && hasLoadedInitialPage.current) {
+      return;
+    }
+    if (page === 1) {
+      hasLoadedInitialPage.current = true;
+    }
     fetchDepartments(page);
   }, [page]);
 

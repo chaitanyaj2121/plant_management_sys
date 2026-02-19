@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
 const limit = 5;
@@ -20,6 +20,7 @@ const WorkCenterSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const hasLoadedInitialPage = useRef(false);
 
   const fetchAssignmentData = async (plantId, depId) => {
     try {
@@ -48,10 +49,12 @@ const WorkCenterSetup = () => {
   };
 
   useEffect(() => {
-    fetchAssignmentData();
-  }, []);
-
-  useEffect(() => {
+    if (page === 1 && hasLoadedInitialPage.current) {
+      return;
+    }
+    if (page === 1) {
+      hasLoadedInitialPage.current = true;
+    }
     fetchWorkCenters(page);
   }, [page]);
 
@@ -77,7 +80,6 @@ const WorkCenterSetup = () => {
       setEditingId(null);
       setForm(defaultForm);
       setIsFormOpen(false);
-      fetchAssignmentData();
       fetchWorkCenters(page);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -107,7 +109,6 @@ const WorkCenterSetup = () => {
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
-    fetchAssignmentData();
     setIsFormOpen(false);
   };
 

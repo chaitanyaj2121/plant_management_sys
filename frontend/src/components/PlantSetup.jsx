@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
 const defaultForm = { name: "", des: "", code: "" };
@@ -13,6 +13,7 @@ const PlantSetup = () => {
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const hasLoadedInitialPage = useRef(false);
 
   const fetchPlants = async (targetPage) => {
     try {
@@ -28,6 +29,12 @@ const PlantSetup = () => {
   };
 
   useEffect(() => {
+    if (page === 1 && hasLoadedInitialPage.current) {
+      return;
+    }
+    if (page === 1) {
+      hasLoadedInitialPage.current = true;
+    }
     fetchPlants(page);
   }, [page]);
 

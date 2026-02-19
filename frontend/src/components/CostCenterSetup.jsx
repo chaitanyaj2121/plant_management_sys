@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
 const limit = 5;
@@ -22,6 +22,7 @@ const CostCenterSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const hasLoadedInitialPage = useRef(false);
 
   const fetchPlants = async () => {
     try {
@@ -76,10 +77,12 @@ const CostCenterSetup = () => {
   };
 
   useEffect(() => {
-    fetchPlants();
-  }, []);
-
-  useEffect(() => {
+    if (page === 1 && hasLoadedInitialPage.current) {
+      return;
+    }
+    if (page === 1) {
+      hasLoadedInitialPage.current = true;
+    }
     fetchCostCenters(page);
   }, [page]);
 
@@ -113,7 +116,6 @@ const CostCenterSetup = () => {
       setEditingId(null);
       setForm(defaultForm);
       setIsFormOpen(false);
-      fetchPlants();
       fetchCostCenters(page);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -153,7 +155,6 @@ const CostCenterSetup = () => {
     setForm(defaultForm);
     setDepartments([]);
     setWorkCenters([]);
-    fetchPlants();
     setIsFormOpen(false);
   };
 
