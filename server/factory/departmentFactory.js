@@ -1,6 +1,6 @@
-const { and, eq, ilike, or, sql } = require("drizzle-orm");
+const { and, eq, ilike, inArray, or, sql } = require("drizzle-orm");
 const db = require("../db/connect_db");
-const { departmentSchema } = require("../models/Schema");
+const { departmentSchema, plantSchema } = require("../models/Schema");
 
 const buildDepartmentWhere = (filters = {}) => {
   const conditions = [];
@@ -12,11 +12,22 @@ const buildDepartmentWhere = (filters = {}) => {
   const search = filters.search?.trim();
   if (search) {
     const pattern = `%${search}%`;
+    const matchingPlantIds = db
+      .select({ id: plantSchema.id })
+      .from(plantSchema)
+      .where(
+        or(
+          ilike(plantSchema.name, pattern),
+          ilike(sql`${plantSchema.code}::text`, pattern),
+        ),
+      );
+
     conditions.push(
       or(
         ilike(departmentSchema.depName, pattern),
         ilike(sql`${departmentSchema.depCode}::text`, pattern),
         ilike(sql`${departmentSchema.depDescription}::text`, pattern),
+        inArray(departmentSchema.plantId, matchingPlantIds),
       ),
     );
   }

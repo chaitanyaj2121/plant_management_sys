@@ -36,7 +36,7 @@ const PlantSetup = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
@@ -305,3 +305,4 @@ const PlantSetup = () => {
 };
 
 export default PlantSetup;
+

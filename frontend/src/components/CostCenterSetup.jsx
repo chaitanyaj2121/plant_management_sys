@@ -88,7 +88,7 @@ const CostCenterSetup = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDebouncedSearchTerm(searchTerm);
-    }, 300);
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
@@ -457,4 +457,5 @@ const CostCenterSetup = () => {
 };
 
 export default CostCenterSetup;
+
 
