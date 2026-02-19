@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
 const defaultForm = { name: "", des: "", code: "" };
-const limit = 4;
+const limit = 5;
 
 const PlantSetup = () => {
   const [plants, setPlants] = useState([]);
@@ -19,7 +19,9 @@ const PlantSetup = () => {
   const fetchPlants = async (targetPage) => {
     try {
       setLoading(true);
-      const { data } = await api.get(`/plants?page=${targetPage}`);
+      const { data } = await api.get(
+        `/plants?page=${targetPage}&limit=${limit}`,
+      );
       setPlants(data.plants || []);
       setTotalPages(data.totalPages || 1);
     } catch (error) {
@@ -232,7 +234,10 @@ const PlantSetup = () => {
                 </tr>
               ) : (
                 filteredPlants.map((plant) => (
-                  <tr key={plant.id} className="h-16 hover:bg-gray-50 transition">
+                  <tr
+                    key={plant.id}
+                    className="h-16 hover:bg-gray-50 transition"
+                  >
                     <td className="px-6 py-4 font-medium text-gray-800 align-middle truncate">
                       {plant.name}
                     </td>

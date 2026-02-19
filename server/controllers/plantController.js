@@ -2,9 +2,7 @@ const plantService = require("../services/plantService");
 
 const getPlants = async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-
-    const result = await plantService.getPlants(page);
+    const result = await plantService.getPlants(req.query);
 
     res.status(200).json(result);
   } catch (err) {

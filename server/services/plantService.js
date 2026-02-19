@@ -1,18 +1,23 @@
 const { v4: uuidv4 } = require("uuid");
 const plantFactory = require("../factory/plantFactory");
+const {
+  parsePagination,
+  buildPaginationMeta,
+} = require("../factory/paginationFactory");
 
-const getPlants = async (page) => {
-  const limit = 4;
-  const offset = (page - 1) * limit;
+const getPlants = async (query) => {
+  const { page, limit, offset } = parsePagination(query);
 
   const plants = await plantFactory.getAllPlants(limit, offset);
   const totalCount = await plantFactory.getTotalPlants();
+  const pagination = buildPaginationMeta(totalCount, page, limit);
 
-  const totalPages = Math.ceil(totalCount / limit);
-
+  // Keep legacy keys for existing frontend consumers.
   return {
+    data: plants,
+    pagination,
     plants,
-    totalPages,
+    totalPages: pagination.totalPages,
   };
 };
 
