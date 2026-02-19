@@ -126,7 +126,6 @@ const PlantSetup = () => {
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, des: e.target.value }))
                 }
-                required
               />
               <input
                 className="rounded border px-3 py-2"

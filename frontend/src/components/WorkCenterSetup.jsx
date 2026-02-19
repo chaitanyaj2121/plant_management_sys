@@ -97,7 +97,8 @@ const WorkCenterSetup = () => {
     }
   };
 
-  const onEdit = (row) => {
+  const onEdit = async (row) => {
+    await fetchAssignmentData(row.plantId, row.depId?.toString() || "");
     setEditingId(row.id);
     setForm({
       plantId: row.plantId || "",
@@ -162,7 +163,7 @@ const WorkCenterSetup = () => {
               </select>
 
               <input className="rounded border px-3 py-2" placeholder="Work Center Name" value={form.workName} onChange={(e) => setForm((prev) => ({ ...prev, workName: e.target.value }))} required />
-              <input className="rounded border px-3 py-2" placeholder="Work Center Code" value={form.workCode} onChange={(e) => setForm((prev) => ({ ...prev, workCode: e.target.value }))} />
+              <input className="rounded border px-3 py-2" placeholder="Work Center Code" value={form.workCode} onChange={(e) => setForm((prev) => ({ ...prev, workCode: e.target.value }))} required />
               <input className="rounded border px-3 py-2" placeholder="Description" value={form.workDescription} onChange={(e) => setForm((prev) => ({ ...prev, workDescription: e.target.value }))} />
 
               <div className="flex gap-2 pt-1">

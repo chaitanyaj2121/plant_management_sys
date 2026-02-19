@@ -64,7 +64,8 @@ const DepartmentSetup = () => {
     }
   };
 
-  const onEdit = (department) => {
+  const onEdit = async (department) => {
+    await fetchAssignmentData();
     setEditingId(department.id);
     setForm({
       plantId: department.plantId || "",
@@ -135,6 +136,7 @@ const DepartmentSetup = () => {
                 placeholder="Department Code"
                 value={form.depCode}
                 onChange={(e) => setForm((prev) => ({ ...prev, depCode: e.target.value }))}
+                required
               />
               <input
                 className="rounded border px-3 py-2"

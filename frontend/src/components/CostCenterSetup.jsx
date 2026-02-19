@@ -140,10 +140,13 @@ const CostCenterSetup = () => {
     }
   };
 
-  const onEdit = (row) => {
+  const onEdit = async (row) => {
     const selectedWorkCenterId = row.workCenters?.length
       ? row.workCenters[0].id?.toString()
       : "";
+    await fetchPlants();
+    await fetchDepartments(row.plantId);
+    await fetchWorkCenters(row.plantId, row.depId?.toString() || "");
     setEditingId(row.id);
     setForm({
       plantId: row.plantId || "",
@@ -209,10 +212,10 @@ const CostCenterSetup = () => {
               </select>
 
               <input className="rounded border px-3 py-2" placeholder="Cost Center Name" value={form.costCenterName} onChange={(e) => setForm((prev) => ({ ...prev, costCenterName: e.target.value }))} required />
-              <input className="rounded border px-3 py-2" placeholder="Cost Center Code" value={form.costCenterCode} onChange={(e) => setForm((prev) => ({ ...prev, costCenterCode: e.target.value }))} />
+              <input className="rounded border px-3 py-2" placeholder="Cost Center Code" value={form.costCenterCode} onChange={(e) => setForm((prev) => ({ ...prev, costCenterCode: e.target.value }))} required />
               <input className="rounded border px-3 py-2" placeholder="Description" value={form.description} onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))} />
 
-              <select className="rounded border px-3 py-2" value={form.workCenterId} onFocus={onWorkCenterDropdownFocus} onChange={(e) => setForm((prev) => ({ ...prev, workCenterId: e.target.value }))} disabled={!form.depId}>
+              <select className="rounded border px-3 py-2" value={form.workCenterId} onFocus={onWorkCenterDropdownFocus} onChange={(e) => setForm((prev) => ({ ...prev, workCenterId: e.target.value }))} disabled={!form.depId} required>
                 <option value="">Select Work Center</option>
                 {workCenters.map((workCenter) => (
                   <option key={workCenter.id} value={workCenter.id}>
