@@ -24,15 +24,26 @@ const WorkCenterSetup = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const lastFetchKey = useRef("");
 
-  const fetchAssignmentData = async (plantId, depId) => {
+  const fetchPlants = async () => {
     try {
-      const params = new URLSearchParams();
-      if (plantId) params.set("plantId", plantId);
-      if (depId) params.set("depId", depId);
-      const { data } = await api.get(
-        `/work-centers/assignment-data?${params.toString()}`,
-      );
+      const { data } = await api.get("/plants/selections");
       setPlants(data.plants || []);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    }
+  };
+
+  const fetchDepartments = async (plantId) => {
+    if (!plantId) {
+      setDepartments([]);
+      return;
+    }
+
+    try {
+      const params = new URLSearchParams({ plantId });
+      const { data } = await api.get(
+        `/departments/selections?${params.toString()}`,
+      );
       setDepartments(data.departments || []);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -74,21 +85,20 @@ const WorkCenterSetup = () => {
 
   const onPlantChange = (plantId) => {
     setForm((prev) => ({ ...prev, plantId, depId: "" }));
-    fetchAssignmentData(plantId, "");
+    fetchDepartments(plantId);
   };
 
   const onDepartmentChange = (depId) => {
     setForm((prev) => ({ ...prev, depId }));
-    fetchAssignmentData(form.plantId, depId);
   };
 
   const onPlantDropdownFocus = () => {
-    fetchAssignmentData();
+    fetchPlants();
   };
 
   const onDepartmentDropdownFocus = () => {
     if (!form.plantId) return;
-    fetchAssignmentData(form.plantId, "");
+    fetchDepartments(form.plantId);
   };
 
   const onSubmit = async (event) => {

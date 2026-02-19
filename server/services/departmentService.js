@@ -21,6 +21,11 @@ const getDepartments = async (query) => {
   };
 };
 
+const getDepartmentSelections = async (query) => {
+  const departments = await departmentFactory.getDepartmentSelections(query.plantId);
+  return { departments };
+};
+
 const createDepartment = async (body) => {
   if (!body.plantId || !body.depName) {
     throw new Error("plantId and depName are required");
@@ -66,15 +71,10 @@ const deleteDepartment = async (id) => {
   return departmentFactory.deleteDepartment(departmentId);
 };
 
-const getDepartmentAssignmentData = async () => {
-  const plants = await plantFactory.getPlantSelections();
-  return { plants };
-};
-
 module.exports = {
   getDepartments,
+  getDepartmentSelections,
   createDepartment,
   updateDepartment,
   deleteDepartment,
-  getDepartmentAssignmentData,
 };

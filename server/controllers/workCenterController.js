@@ -9,6 +9,15 @@ const getWorkCenters = async (req, res) => {
   }
 };
 
+const getWorkCenterSelections = async (req, res) => {
+  try {
+    const result = await workCenterService.getWorkCenterSelections(req.query);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const createWorkCenter = async (req, res) => {
   try {
     await workCenterService.createWorkCenter(req.body);
@@ -38,20 +47,11 @@ const deleteWorkCenter = async (req, res) => {
   }
 };
 
-const getWorkCenterAssignmentData = async (req, res) => {
-  try {
-    const result = await workCenterService.getWorkCenterAssignmentData(req.query);
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
 module.exports = {
   getWorkCenters,
+  getWorkCenterSelections,
   createWorkCenter,
   updateWorkCenter,
   deleteWorkCenter,
-  getWorkCenterAssignmentData,
 };
 

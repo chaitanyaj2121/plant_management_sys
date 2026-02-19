@@ -24,6 +24,11 @@ const getPlants = async (query) => {
   };
 };
 
+const getPlantSelections = async () => {
+  const plants = await plantFactory.getPlantSelections();
+  return { plants };
+};
+
 const createPlant = async (body) => {
   if (!body.name || !body.code) {
     throw new Error("name and code are required");
@@ -49,6 +54,7 @@ const deletePlant = async (id) => {
 
 module.exports = {
   getPlants,
+  getPlantSelections,
   createPlant,
   updatePlant,
   deletePlant,

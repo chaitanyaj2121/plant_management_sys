@@ -3,8 +3,8 @@ const departmentController = require("../controllers/departmentController");
 
 const router = express.Router();
 
-router.get("/assignment-data", departmentController.getDepartmentAssignmentData);
 router.get("/", departmentController.getDepartments);
+router.get("/selections", departmentController.getDepartmentSelections);
 router.post("/", departmentController.createDepartment);
 router.put("/:id", departmentController.updateDepartment);
 router.delete("/:id", departmentController.deleteDepartment);

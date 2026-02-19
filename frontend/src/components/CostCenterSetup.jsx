@@ -28,7 +28,7 @@ const CostCenterSetup = () => {
 
   const fetchPlants = async () => {
     try {
-      const { data } = await api.get("/cost-centers/plants");
+      const { data } = await api.get("/plants/selections");
       setPlants(data.plants || []);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -44,7 +44,7 @@ const CostCenterSetup = () => {
     try {
       const params = new URLSearchParams({ plantId });
       const { data } = await api.get(
-        `/cost-centers/departments?${params.toString()}`,
+        `/departments/selections?${params.toString()}`,
       );
       setDepartments(data.departments || []);
     } catch (error) {
@@ -61,7 +61,7 @@ const CostCenterSetup = () => {
     try {
       const params = new URLSearchParams({ plantId, depId });
       const { data } = await api.get(
-        `/cost-centers/work-centers?${params.toString()}`,
+        `/work-centers/selections?${params.toString()}`,
       );
       setWorkCenters(data.workCenters || []);
     } catch (error) {
@@ -115,42 +115,18 @@ const CostCenterSetup = () => {
     fetchWorkCenters(form.plantId, depId);
   };
 
-  const onPlantDropdownFocus = async () => {
-    try {
-      const { data } = await api.get("/cost-centers/plants");
-      setPlants(data.plants || []);
-    } catch (error) {
-      alert(getErrorMessage(error));
-    }
+  const onPlantDropdownFocus = () => {
+    fetchPlants();
   };
 
-  const onDepartmentDropdownFocus = async () => {
+  const onDepartmentDropdownFocus = () => {
     if (!form.plantId) return;
-    try {
-      const params = new URLSearchParams({ plantId: form.plantId });
-      const { data } = await api.get(
-        `/cost-centers/departments?${params.toString()}`,
-      );
-      setDepartments(data.departments || []);
-    } catch (error) {
-      alert(getErrorMessage(error));
-    }
+    fetchDepartments(form.plantId);
   };
 
-  const onWorkCenterDropdownFocus = async () => {
+  const onWorkCenterDropdownFocus = () => {
     if (!form.plantId || !form.depId) return;
-    try {
-      const params = new URLSearchParams({
-        plantId: form.plantId,
-        depId: form.depId,
-      });
-      const { data } = await api.get(
-        `/cost-centers/work-centers?${params.toString()}`,
-      );
-      setWorkCenters(data.workCenters || []);
-    } catch (error) {
-      alert(getErrorMessage(error));
-    }
+    fetchWorkCenters(form.plantId, form.depId);
   };
 
   const onSubmit = async (event) => {

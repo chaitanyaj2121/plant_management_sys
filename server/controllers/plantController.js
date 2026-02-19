@@ -10,6 +10,15 @@ const getPlants = async (req, res) => {
   }
 };
 
+const getPlantSelections = async (req, res) => {
+  try {
+    const result = await plantService.getPlantSelections();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const createPlant = async (req, res) => {
   try {
     await plantService.createPlant(req.body);
@@ -41,6 +50,7 @@ const deletePlant = async (req, res) => {
 
 module.exports = {
   getPlants,
+  getPlantSelections,
   createPlant,
   updatePlant,
   deletePlant,

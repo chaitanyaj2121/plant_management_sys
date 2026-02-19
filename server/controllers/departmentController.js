@@ -9,6 +9,15 @@ const getDepartments = async (req, res) => {
   }
 };
 
+const getDepartmentSelections = async (req, res) => {
+  try {
+    const result = await departmentService.getDepartmentSelections(req.query);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 const createDepartment = async (req, res) => {
   try {
     await departmentService.createDepartment(req.body);
@@ -38,20 +47,11 @@ const deleteDepartment = async (req, res) => {
   }
 };
 
-const getDepartmentAssignmentData = async (req, res) => {
-  try {
-    const result = await departmentService.getDepartmentAssignmentData();
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
 module.exports = {
   getDepartments,
+  getDepartmentSelections,
   createDepartment,
   updateDepartment,
   deleteDepartment,
-  getDepartmentAssignmentData,
 };
 

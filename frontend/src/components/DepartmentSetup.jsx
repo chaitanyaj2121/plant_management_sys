@@ -22,9 +22,9 @@ const DepartmentSetup = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const lastFetchKey = useRef("");
 
-  const fetchAssignmentData = async () => {
+  const fetchPlants = async () => {
     try {
-      const { data } = await api.get("/departments/assignment-data");
+      const { data } = await api.get("/plants/selections");
       setPlants(data.plants || []);
     } catch (error) {
       alert(getErrorMessage(error));
@@ -148,7 +148,7 @@ const DepartmentSetup = () => {
               <select
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                 value={form.plantId}
-                onFocus={fetchAssignmentData}
+                onFocus={fetchPlants}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, plantId: e.target.value }))
                 }

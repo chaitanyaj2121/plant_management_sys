@@ -43,55 +43,9 @@ const deleteCostCenter = async (req, res) => {
   }
 };
 
-const getCostCenterAssignmentData = async (req, res) => {
-  try {
-    const result = await costCenterService.getCostCenterAssignmentData(
-      req.query,
-    );
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-const getCostCenterPlants = async (req, res) => {
-  try {
-    const result = await costCenterService.getCostCenterPlantSelections();
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-const getCostCenterDepartments = async (req, res) => {
-  try {
-    const result = await costCenterService.getCostCenterDepartmentSelections(
-      req.query,
-    );
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-const getCostCenterWorkCenters = async (req, res) => {
-  try {
-    const result = await costCenterService.getCostCenterWorkCenterSelections(
-      req.query,
-    );
-    res.status(200).json(result);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
 module.exports = {
   getCostCenters,
   createCostCenter,
   updateCostCenter,
   deleteCostCenter,
-  getCostCenterAssignmentData,
-  getCostCenterPlants,
-  getCostCenterDepartments,
-  getCostCenterWorkCenters,
 };

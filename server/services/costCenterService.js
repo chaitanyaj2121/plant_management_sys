@@ -1,7 +1,6 @@
 const costCenterFactory = require("../factory/costCenterFactory");
 const departmentFactory = require("../factory/departmentFactory");
 const plantFactory = require("../factory/plantFactory");
-const workCenterFactory = require("../factory/workCenterFactory");
 const {
   parsePagination,
   buildPaginationMeta,
@@ -139,46 +138,9 @@ const deleteCostCenter = async (id) => {
   return costCenterFactory.deleteCostCenter(costCenterId);
 };
 
-const getCostCenterAssignmentData = async (query) => {
-  const plantId = query.plantId;
-  const depId = query.depId ? Number(query.depId) : undefined;
-
-  const plants = await plantFactory.getPlantSelections();
-  const departments = await departmentFactory.getDepartmentSelections(plantId);
-  const workCenters = await workCenterFactory.getWorkCenterSelections({ plantId, depId });
-
-  return {
-    plants,
-    departments,
-    workCenters,
-  };
-};
-
-const getCostCenterPlantSelections = async () => {
-  const plants = await plantFactory.getPlantSelections();
-  return { plants };
-};
-
-const getCostCenterDepartmentSelections = async (query) => {
-  const plantId = query.plantId;
-  const departments = await departmentFactory.getDepartmentSelections(plantId);
-  return { departments };
-};
-
-const getCostCenterWorkCenterSelections = async (query) => {
-  const plantId = query.plantId;
-  const depId = query.depId ? Number(query.depId) : undefined;
-  const workCenters = await workCenterFactory.getWorkCenterSelections({ plantId, depId });
-  return { workCenters };
-};
-
 module.exports = {
   getCostCenters,
   createCostCenter,
   updateCostCenter,
   deleteCostCenter,
-  getCostCenterAssignmentData,
-  getCostCenterPlantSelections,
-  getCostCenterDepartmentSelections,
-  getCostCenterWorkCenterSelections,
 };

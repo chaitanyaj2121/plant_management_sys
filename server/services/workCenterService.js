@@ -52,6 +52,17 @@ const getWorkCenters = async (query) => {
   };
 };
 
+const getWorkCenterSelections = async (query) => {
+  const plantId = query.plantId;
+  const depId = query.depId ? Number(query.depId) : undefined;
+  const workCenters = await workCenterFactory.getWorkCenterSelections({
+    plantId,
+    depId,
+  });
+
+  return { workCenters };
+};
+
 const createWorkCenter = async (body) => {
   if (!body.plantId || !body.depId || !body.workName) {
     throw new Error("plantId, depId and workName are required");
@@ -114,28 +125,10 @@ const deleteWorkCenter = async (id) => {
   return workCenterFactory.deleteWorkCenter(workCenterId);
 };
 
-const getWorkCenterAssignmentData = async (query) => {
-  const plantId = query.plantId;
-  const depId = query.depId ? Number(query.depId) : undefined;
-
-  const plants = await plantFactory.getPlantSelections();
-  const departments = await departmentFactory.getDepartmentSelections(plantId);
-  const costCenters = await costCenterFactory.getCostCenters(1000, 0, {
-    plantId,
-    depId,
-  });
-
-  return {
-    plants,
-    departments,
-    costCenters,
-  };
-};
-
 module.exports = {
   getWorkCenters,
+  getWorkCenterSelections,
   createWorkCenter,
   updateWorkCenter,
   deleteWorkCenter,
-  getWorkCenterAssignmentData,
 };
