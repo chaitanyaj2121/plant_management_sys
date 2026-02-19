@@ -218,14 +218,14 @@ const PlantSetup = () => {
           Loading plants...
         </div>
       ) : (
-        <div className="mb-6 overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
+        <div className="mb-6 min-h-[320px] overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="w-full table-fixed text-sm">
             <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-wider">
               <tr>
-                <th className="px-6 py-3 text-left">Name</th>
-                <th className="px-6 py-3 text-left">Description</th>
-                <th className="px-6 py-3 text-left">Code</th>
-                <th className="px-6 py-3 text-left">Actions</th>
+                <th className="w-[22%] px-6 py-3 text-left">Name</th>
+                <th className="w-[43%] px-6 py-3 text-left">Description</th>
+                <th className="w-[12%] px-6 py-3 text-left">Code</th>
+                <th className="w-[23%] px-6 py-3 text-left">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -240,13 +240,19 @@ const PlantSetup = () => {
                 </tr>
               ) : (
                 filteredPlants.map((plant) => (
-                  <tr key={plant.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 font-medium text-gray-800">
+                  <tr key={plant.id} className="h-16 hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 font-medium text-gray-800 align-middle truncate">
                       {plant.name}
                     </td>
-                    <td className="px-6 py-4 text-gray-600">{plant.des}</td>
-                    <td className="px-6 py-4 text-gray-600">{plant.code}</td>
-                    <td className="px-6 py-4 space-x-2">
+                    <td className="px-6 py-4 text-gray-600 align-middle">
+                      <p className="truncate" title={plant.des || "-"}>
+                        {plant.des || "-"}
+                      </p>
+                    </td>
+                    <td className="px-6 py-4 text-gray-600 align-middle truncate">
+                      {plant.code}
+                    </td>
+                    <td className="px-6 py-4 align-middle space-x-2">
                       <button
                         className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-100 hover:border-gray-400"
                         onClick={() => onEdit(plant)}

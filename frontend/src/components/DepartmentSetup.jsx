@@ -230,19 +230,19 @@ const DepartmentSetup = () => {
           Loading departments...
         </div>
       ) : (
-        <div className="mb-6 overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <table className="w-full text-sm">
+        <div className="mb-6 min-h-[320px] overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="w-full table-fixed text-sm">
             <thead className="bg-gray-50 text-xs uppercase tracking-wider text-gray-600">
               <tr>
-                <th className="px-6 py-3 text-left font-semibold">Plant</th>
-                <th className="px-6 py-3 text-left font-semibold">
+                <th className="w-[20%] px-6 py-3 text-left font-semibold">Plant</th>
+                <th className="w-[24%] px-6 py-3 text-left font-semibold">
                   Department
                 </th>
-                <th className="px-6 py-3 text-left font-semibold">Code</th>
-                <th className="px-6 py-3 text-left font-semibold">
+                <th className="w-[13%] px-6 py-3 text-left font-semibold">Code</th>
+                <th className="w-[23%] px-6 py-3 text-left font-semibold">
                   Description
                 </th>
-                <th className="px-6 py-3 text-left font-semibold">Actions</th>
+                <th className="w-[20%] px-6 py-3 text-left font-semibold">Actions</th>
               </tr>
             </thead>
 
@@ -255,20 +255,22 @@ const DepartmentSetup = () => {
                 </tr>
               ) : (
                 filteredDepartments.map((row) => (
-                  <tr key={row.id} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 text-gray-700 font-medium">
+                  <tr key={row.id} className="h-16 hover:bg-gray-50 transition">
+                    <td className="px-6 py-4 text-gray-700 font-medium align-middle truncate">
                       {row.plant?.name || row.plantId}
                     </td>
-                    <td className="px-6 py-4 text-gray-800 font-medium">
+                    <td className="px-6 py-4 text-gray-800 font-medium align-middle truncate">
                       {row.depName}
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
+                    <td className="px-6 py-4 text-gray-600 align-middle truncate">
                       {row.depCode || "-"}
                     </td>
-                    <td className="px-6 py-4 text-gray-600">
-                      {row.depDescription || "-"}
+                    <td className="px-6 py-4 text-gray-600 align-middle">
+                      <p className="truncate" title={row.depDescription || "-"}>
+                        {row.depDescription || "-"}
+                      </p>
                     </td>
-                    <td className="px-6 py-4 space-x-2">
+                    <td className="px-6 py-4 align-middle space-x-2">
                       <button
                         className="inline-flex items-center rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-100 hover:border-gray-400"
                         onClick={() => onEdit(row)}
