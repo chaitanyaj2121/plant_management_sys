@@ -11,6 +11,7 @@ const PlantSetup = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(defaultLimit);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [form, setForm] = useState(defaultForm);
@@ -28,6 +29,7 @@ const PlantSetup = () => {
       );
       setPlants(data.plants || []);
       setTotalPages(data.totalPages || 1);
+      setTotalCount(data.pagination?.totalCount || 0);
     } catch (error) {
       alert(getErrorMessage(error));
     } finally {
@@ -309,6 +311,11 @@ const PlantSetup = () => {
         <span className="text-sm text-gray-600">
           Page <span className="font-semibold">{page}</span> of{" "}
           <span className="font-semibold">{totalPages}</span>
+        </span>
+
+        <span className="text-sm text-gray-600">
+          Showing entries <span className="font-semibold">{plants.length}</span>{" "}
+          out of <span className="font-semibold">{totalCount}</span>
         </span>
 
         <button

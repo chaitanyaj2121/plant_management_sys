@@ -16,6 +16,7 @@ const DepartmentSetup = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(defaultLimit);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -48,6 +49,7 @@ const DepartmentSetup = () => {
       );
       setDepartments(data.data || []);
       setTotalPages(data.pagination?.totalPages || 1);
+      setTotalCount(data.pagination?.totalCount || 0);
     } catch (error) {
       alert(getErrorMessage(error));
     } finally {
@@ -334,6 +336,12 @@ const DepartmentSetup = () => {
         <span className="text-sm text-gray-600">
           Page <span className="font-semibold">{page}</span> of{" "}
           <span className="font-semibold">{totalPages}</span>
+        </span>
+
+        <span className="text-sm text-gray-600">
+          Showing entries{" "}
+          <span className="font-semibold">{departments.length}</span> out of{" "}
+          <span className="font-semibold">{totalCount}</span>
         </span>
 
         <button
