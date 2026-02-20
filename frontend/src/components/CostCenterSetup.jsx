@@ -237,15 +237,29 @@ const CostCenterSetup = () => {
   return (
     <div className="flex min-h-[calc(100vh-40px)] flex-col">
       <div className="mb-6 flex items-center justify-between">
-        <input
-          className="w-96 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-          placeholder="Search by plant name or code"
-          value={searchTerm}
-          onChange={(e) => {
-            setPage(1);
-            setSearchTerm(e.target.value);
-          }}
-        />
+        <div className="flex items-center gap-2">
+          <input
+            className="w-96 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            placeholder="Search by plant name or code"
+            value={searchTerm}
+            onChange={(e) => {
+              setPage(1);
+              setSearchTerm(e.target.value);
+            }}
+          />
+          <button
+            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            type="button"
+            onClick={() => {
+              setPage(1);
+              setSearchTerm("");
+              setDebouncedSearchTerm("");
+            }}
+            disabled={!searchTerm.trim()}
+          >
+            Clear
+          </button>
+        </div>
         <button
           className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-5 py-2.5 text-sm font-semibold text-blue-700 border border-blue-200 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           onClick={onAdd}
