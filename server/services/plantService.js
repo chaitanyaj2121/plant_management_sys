@@ -27,6 +27,14 @@ const getPlantSelections = async () => {
   return { plants };
 };
 
+const getPlantById = async (id) => {
+  const plant = await plantFactory.getPlantById(id);
+  if (!plant) {
+    throw new Error("Plant not found");
+  }
+  return { plant };
+};
+
 const createPlant = async (body) => {
   if (!body.name || !body.code) {
     throw new Error("name and code are required");
@@ -53,6 +61,7 @@ const deletePlant = async (id) => {
 module.exports = {
   getPlants,
   getPlantSelections,
+  getPlantById,
   createPlant,
   updatePlant,
   deletePlant,

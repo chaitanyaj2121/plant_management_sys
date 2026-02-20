@@ -80,14 +80,24 @@ const PlantSetup = () => {
     }
   };
 
-  const onEdit = (plant) => {
-    setEditingId(plant.id);
-    setForm({
-      name: plant.name || "",
-      des: plant.des || "",
-      code: plant.code || "",
-    });
-    setIsFormOpen(true);
+  const onEdit = async (plant) => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/plants/${plant.id}`);
+      const selectedPlant = data?.plant;
+
+      setEditingId(selectedPlant?.id || plant.id);
+      setForm({
+        name: selectedPlant?.name || "",
+        des: selectedPlant?.des || "",
+        code: selectedPlant?.code || "",
+      });
+      setIsFormOpen(true);
+    } catch (error) {
+      alert(getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onAdd = () => {

@@ -4,6 +4,7 @@ const plantController = require("../controllers/plantController");
 
 router.get("/", plantController.getPlants);
 router.get("/selections", plantController.getPlantSelections);
+router.get("/:id", plantController.getPlantById);
 router.post("/", plantController.createPlant);
 router.put("/:id", plantController.updatePlant);
 router.delete("/:id", plantController.deletePlant);

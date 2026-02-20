@@ -19,6 +19,17 @@ const getPlantSelections = async (req, res) => {
   }
 };
 
+const getPlantById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await plantService.getPlantById(id);
+    res.status(200).json(result);
+  } catch (err) {
+    const statusCode = err.message === "Plant not found" ? 404 : 400;
+    res.status(statusCode).json({ error: err.message });
+  }
+};
+
 const createPlant = async (req, res) => {
   try {
     await plantService.createPlant(req.body);
@@ -51,6 +62,7 @@ const deletePlant = async (req, res) => {
 module.exports = {
   getPlants,
   getPlantSelections,
+  getPlantById,
   createPlant,
   updatePlant,
   deletePlant,
