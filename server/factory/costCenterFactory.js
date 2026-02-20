@@ -72,7 +72,10 @@ const createCostCenter = async (data) => {
 };
 
 const updateCostCenter = async (id, data) => {
-  return db.update(costCenterSchema).set(data).where(eq(costCenterSchema.id, id));
+  return db
+    .update(costCenterSchema)
+    .set(data)
+    .where(eq(costCenterSchema.id, id));
 };
 
 const deleteCostCenter = async (id) => {

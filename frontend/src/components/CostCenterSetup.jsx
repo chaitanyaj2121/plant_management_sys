@@ -260,7 +260,7 @@ const CostCenterSetup = () => {
               <select
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                 value={form.plantId}
-                onFocus={onPlantDropdownFocus}
+                onMouseDown={onPlantDropdownFocus}
                 onChange={(e) => onPlantChange(e.target.value)}
                 required
               >
@@ -275,7 +275,7 @@ const CostCenterSetup = () => {
               <select
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                 value={form.depId}
-                onFocus={onDepartmentDropdownFocus}
+                onMouseDown={onDepartmentDropdownFocus}
                 onChange={(e) => onDepartmentChange(e.target.value)}
                 required
                 disabled={!form.plantId}
@@ -329,7 +329,7 @@ const CostCenterSetup = () => {
               <select
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                 value={form.workCenterId}
-                onFocus={onWorkCenterDropdownFocus}
+                onMouseDown={onWorkCenterDropdownFocus}
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
@@ -521,3 +521,4 @@ const CostCenterSetup = () => {
 };
 
 export default CostCenterSetup;
+
