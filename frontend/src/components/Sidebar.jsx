@@ -11,38 +11,43 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 h-screen bg-white border-r border-gray-200 shadow-sm flex flex-col">
-      <div className="px-6 py-6 border-b border-gray-100">
-        <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
-          Dashboard
-        </h2>
-        <p className="text-sm text-gray-500 mt-1">Management Panel</p>
-      </div>
+    <aside className="sticky top-0 h-screen w-52 shrink-0 border-r border-gray-200 bg-white shadow-sm">
+      <div className="flex h-full flex-col overflow-hidden">
+        <div className="border-b border-gray-100 px-4 py-5">
+          <h2 className="text-lg font-semibold tracking-tight text-gray-800">
+            Dashboard
+          </h2>
+          <p className="mt-1 text-xs text-gray-500">Management Panel</p>
+        </div>
 
-      <nav className="flex-1 px-4 py-6 space-y-2">
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+        <nav className="flex-1 overflow-y-auto px-3 py-4">
+          <ul className="space-y-1.5">
+            {menuItems.map((item) => {
+              const isActive = location.pathname === item.path;
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
-                ${
-                  isActive
-                    ? "bg-blue-50 text-blue-600 border-l-4 border-blue-600"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                }
-              `}
-            >
-              {item.name}
-            </Link>
-          );
-        })}
-      </nav>
+              return (
+                <li key={item.path}>
+                  <Link
+                    to={item.path}
+                    className={`block rounded-md px-3 py-2 text-sm font-medium transition-colors
+                      ${
+                        isActive
+                          ? "bg-blue-600 text-white"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      }
+                    `}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-      <div className="px-6 py-4 border-t border-gray-100 text-xs text-gray-400">
-        © 2026 Your Company
+        <div className="border-t border-gray-100 px-4 py-3 text-[11px] text-gray-400">
+          (c) 2026 Your Company
+        </div>
       </div>
     </aside>
   );

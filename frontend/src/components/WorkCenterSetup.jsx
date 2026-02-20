@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
-const limit = 5;
+const defaultLimit = 5;
+const rowsPerPageOptions = [5, 10, 20, 50];
 const defaultForm = {
   plantId: "",
   depId: "",
@@ -15,6 +16,7 @@ const WorkCenterSetup = () => {
   const [departments, setDepartments] = useState([]);
   const [workCenters, setWorkCenters] = useState([]);
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(defaultLimit);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -63,12 +65,12 @@ const WorkCenterSetup = () => {
     }
   };
 
-  const fetchWorkCenters = async (targetPage, targetSearch) => {
+  const fetchWorkCenters = async (targetPage, targetSearch, targetLimit) => {
     try {
       setLoading(true);
       const search = targetSearch?.trim() || "";
       const { data } = await api.get(
-        `/work-centers?page=${targetPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
+        `/work-centers?page=${targetPage}&limit=${targetLimit}&search=${encodeURIComponent(search)}`,
       );
       setWorkCenters(data.data || []);
       setTotalPages(data.pagination?.totalPages || 1);
@@ -88,13 +90,13 @@ const WorkCenterSetup = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    const fetchKey = `${page}|${debouncedSearchTerm.trim()}`;
+    const fetchKey = `${page}|${limit}|${debouncedSearchTerm.trim()}`;
     if (lastFetchKey.current === fetchKey) {
       return;
     }
     lastFetchKey.current = fetchKey;
-    fetchWorkCenters(page, debouncedSearchTerm);
-  }, [page, debouncedSearchTerm]);
+    fetchWorkCenters(page, debouncedSearchTerm, limit);
+  }, [page, limit, debouncedSearchTerm]);
 
   const onPlantChange = (plantId) => {
     setForm((prev) => ({ ...prev, plantId, depId: "" }));
@@ -128,7 +130,7 @@ const WorkCenterSetup = () => {
       setEditingId(null);
       setForm(defaultForm);
       setIsFormOpen(false);
-      fetchWorkCenters(page, debouncedSearchTerm);
+      fetchWorkCenters(page, debouncedSearchTerm, limit);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -172,7 +174,7 @@ const WorkCenterSetup = () => {
     try {
       await api.delete(`/work-centers/${id}`);
       alert("Work center deleted successfully");
-      fetchWorkCenters(page, debouncedSearchTerm);
+      fetchWorkCenters(page, debouncedSearchTerm, limit);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -364,7 +366,25 @@ const WorkCenterSetup = () => {
         </div>
       )}
 
-      <div className="mt-auto flex items-center justify-between pt-4">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>Rows per page</span>
+          <select
+            className="rounded-lg border border-gray-300 px-2 py-1 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            value={limit}
+            onChange={(e) => {
+              setPage(1);
+              setLimit(Number(e.target.value));
+            }}
+          >
+            {rowsPerPageOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <button
           className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:opacity-50"
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

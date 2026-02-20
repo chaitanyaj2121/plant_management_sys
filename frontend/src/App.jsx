@@ -11,10 +11,10 @@ import CostCenterSetup from "./components/CostCenterSetup";
 const App = () => {
   return (
     <Router>
-      <div style={{ display: "flex", minHeight: "100vh" }}>
+      <div className="flex min-h-screen bg-gray-50">
         <Sidebar />
 
-        <div style={{ flex: 1, padding: "20px" }}>
+        <main className="min-w-0 flex-1 p-4 sm:p-5">
           <Routes>
             <Route path="/" element={<Navigate to="/plant" replace />} />
             <Route path="/plant" element={<PlantSetup />} />
@@ -22,7 +22,7 @@ const App = () => {
             <Route path="/work-center" element={<WorkCenterSetup />} />
             <Route path="/cost-center" element={<CostCenterSetup />} />
           </Routes>
-        </div>
+        </main>
       </div>
     </Router>
   );

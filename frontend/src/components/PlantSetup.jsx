@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
 const defaultForm = { name: "", des: "", code: "" };
-const limit = 5;
+const defaultLimit = 5;
+const rowsPerPageOptions = [5, 10, 20, 50];
 
 const PlantSetup = () => {
   const [plants, setPlants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(defaultLimit);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -17,12 +19,12 @@ const PlantSetup = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const lastFetchKey = useRef("");
 
-  const fetchPlants = async (targetPage, targetSearch) => {
+  const fetchPlants = async (targetPage, targetSearch, targetLimit) => {
     try {
       setLoading(true);
       const search = targetSearch?.trim() || "";
       const { data } = await api.get(
-        `/plants?page=${targetPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
+        `/plants?page=${targetPage}&limit=${targetLimit}&search=${encodeURIComponent(search)}`,
       );
       setPlants(data.plants || []);
       setTotalPages(data.totalPages || 1);
@@ -42,13 +44,13 @@ const PlantSetup = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    const fetchKey = `${page}|${debouncedSearchTerm.trim()}`;
+    const fetchKey = `${page}|${limit}|${debouncedSearchTerm.trim()}`;
     if (lastFetchKey.current === fetchKey) {
       return;
     }
     lastFetchKey.current = fetchKey;
-    fetchPlants(page, debouncedSearchTerm);
-  }, [page, debouncedSearchTerm]);
+    fetchPlants(page, debouncedSearchTerm, limit);
+  }, [page, limit, debouncedSearchTerm]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -68,7 +70,7 @@ const PlantSetup = () => {
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
-      fetchPlants(page, debouncedSearchTerm);
+      fetchPlants(page, debouncedSearchTerm, limit);
     } catch (error) {
       alert(getErrorMessage(error));
     } finally {
@@ -102,7 +104,7 @@ const PlantSetup = () => {
     try {
       await api.delete(`/plants/${id}`);
       alert("Plant deleted successfully");
-      fetchPlants(page, debouncedSearchTerm);
+      fetchPlants(page, debouncedSearchTerm, limit);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -276,7 +278,25 @@ const PlantSetup = () => {
       )}
 
       {/* Pagination */}
-      <div className="mt-auto flex items-center justify-between pt-4">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>Rows per page</span>
+          <select
+            className="rounded-lg border border-gray-300 px-2 py-1 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            value={limit}
+            onChange={(e) => {
+              setPage(1);
+              setLimit(Number(e.target.value));
+            }}
+          >
+            {rowsPerPageOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <button
           className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 transition disabled:opacity-50"
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

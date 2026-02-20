@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
 
-const limit = 5;
+const defaultLimit = 5;
+const rowsPerPageOptions = [5, 10, 20, 50];
 const defaultForm = {
   plantId: "",
   depName: "",
@@ -13,6 +14,7 @@ const DepartmentSetup = () => {
   const [plants, setPlants] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(defaultLimit);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -37,12 +39,12 @@ const DepartmentSetup = () => {
     }
   };
 
-  const fetchDepartments = async (targetPage, targetSearch) => {
+  const fetchDepartments = async (targetPage, targetSearch, targetLimit) => {
     try {
       setLoading(true);
       const search = targetSearch?.trim() || "";
       const { data } = await api.get(
-        `/departments?page=${targetPage}&limit=${limit}&search=${encodeURIComponent(search)}`,
+        `/departments?page=${targetPage}&limit=${targetLimit}&search=${encodeURIComponent(search)}`,
       );
       setDepartments(data.data || []);
       setTotalPages(data.pagination?.totalPages || 1);
@@ -62,13 +64,13 @@ const DepartmentSetup = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    const fetchKey = `${page}|${debouncedSearchTerm.trim()}`;
+    const fetchKey = `${page}|${limit}|${debouncedSearchTerm.trim()}`;
     if (lastFetchKey.current === fetchKey) {
       return;
     }
     lastFetchKey.current = fetchKey;
-    fetchDepartments(page, debouncedSearchTerm);
-  }, [page, debouncedSearchTerm]);
+    fetchDepartments(page, debouncedSearchTerm, limit);
+  }, [page, limit, debouncedSearchTerm]);
 
   const submitForm = async (event) => {
     event.preventDefault();
@@ -83,7 +85,7 @@ const DepartmentSetup = () => {
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
-      fetchDepartments(page, debouncedSearchTerm);
+      fetchDepartments(page, debouncedSearchTerm, limit);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -121,7 +123,7 @@ const DepartmentSetup = () => {
     try {
       await api.delete(`/departments/${id}`);
       alert("Department deleted successfully");
-      fetchDepartments(page, debouncedSearchTerm);
+      fetchDepartments(page, debouncedSearchTerm, limit);
     } catch (error) {
       alert(getErrorMessage(error));
     }
@@ -301,7 +303,25 @@ const DepartmentSetup = () => {
         </div>
       )}
 
-      <div className="mt-auto flex items-center justify-between pt-4">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-4">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>Rows per page</span>
+          <select
+            className="rounded-lg border border-gray-300 px-2 py-1 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            value={limit}
+            onChange={(e) => {
+              setPage(1);
+              setLimit(Number(e.target.value));
+            }}
+          >
+            {rowsPerPageOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <button
           className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:opacity-50"
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
