@@ -15,9 +15,7 @@ const getPlants = async (query) => {
   const totalCount = await plantFactory.getTotalPlants(filters);
   const pagination = buildPaginationMeta(totalCount, page, limit);
 
-  // Keep legacy keys for existing frontend consumers.
   return {
-    data: plants,
     pagination,
     plants,
     totalPages: pagination.totalPages,
