@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get("/", workCenterController.getWorkCenters);
 router.get("/selections", workCenterController.getWorkCenterSelections);
+router.get("/:id", workCenterController.getWorkCenterById);
 router.post("/", workCenterController.createWorkCenter);
 router.put("/:id", workCenterController.updateWorkCenter);
 router.delete("/:id", workCenterController.deleteWorkCenter);

@@ -181,26 +181,40 @@ const WorkCenterSetup = () => {
     }
   };
 
-  const onEdit = (row) => {
-    setEditingId(row.id);
-    setForm({
-      plantId: row.plantId || "",
-      depId: row.depId?.toString() || "",
-      workName: row.workName || "",
-      workCode: row.workCode || "",
-      workDescription: row.workDescription || "",
-    });
+  const onEdit = async (row) => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/work-centers/${row.id}`);
+      const selectedWorkCenter = data?.workCenter || row;
 
-    if (row.plant) {
-      setPlants([row.plant]);
-      hasPlantSelectionsLoaded.current = false;
-    }
-    if (row.department) {
-      setDepartments([row.department]);
-      departmentsLoadedForPlant.current = "";
-    }
+      setEditingId(selectedWorkCenter.id || row.id);
+      setForm({
+        plantId: selectedWorkCenter.plantId || "",
+        depId: selectedWorkCenter.depId?.toString() || "",
+        workName: selectedWorkCenter.workName || "",
+        workCode: selectedWorkCenter.workCode || "",
+        workDescription: selectedWorkCenter.workDescription || "",
+      });
 
-    setIsFormOpen(true);
+      if (selectedWorkCenter.plant) {
+        setPlants([selectedWorkCenter.plant]);
+        hasPlantSelectionsLoaded.current = false;
+      }
+      if (selectedWorkCenter.department) {
+        setDepartments([selectedWorkCenter.department]);
+        departmentsLoadedForPlant.current = "";
+      }
+
+      setIsFormOpen(true);
+    } catch (error) {
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onAdd = () => {

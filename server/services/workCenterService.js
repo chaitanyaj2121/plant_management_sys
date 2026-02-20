@@ -70,6 +70,17 @@ const getWorkCenterSelections = async (query) => {
   return { workCenters };
 };
 
+const getWorkCenterById = async (id) => {
+  const workCenterId = Number(id);
+  const workCenter = await workCenterFactory.getWorkCenterById(workCenterId);
+
+  if (!workCenter) {
+    throw new Error("Work center not found");
+  }
+
+  return { workCenter };
+};
+
 const createWorkCenter = async (body) => {
   if (!body.plantId || !body.depId || !body.workName) {
     throw new Error("plantId, depId and workName are required");
@@ -132,6 +143,7 @@ const deleteWorkCenter = async (id) => {
 module.exports = {
   getWorkCenters,
   getWorkCenterSelections,
+  getWorkCenterById,
   createWorkCenter,
   updateWorkCenter,
   deleteWorkCenter,

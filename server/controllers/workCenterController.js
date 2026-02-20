@@ -18,6 +18,17 @@ const getWorkCenterSelections = async (req, res) => {
   }
 };
 
+const getWorkCenterById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await workCenterService.getWorkCenterById(id);
+    res.status(200).json(result);
+  } catch (err) {
+    const statusCode = err.message === "Work center not found" ? 404 : 400;
+    res.status(statusCode).json({ error: err.message });
+  }
+};
+
 const createWorkCenter = async (req, res) => {
   try {
     await workCenterService.createWorkCenter(req.body);
@@ -50,6 +61,7 @@ const deleteWorkCenter = async (req, res) => {
 module.exports = {
   getWorkCenters,
   getWorkCenterSelections,
+  getWorkCenterById,
   createWorkCenter,
   updateWorkCenter,
   deleteWorkCenter,
