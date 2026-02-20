@@ -1,6 +1,8 @@
 const costCenterFactory = require("../factory/costCenterFactory");
-const departmentFactory = require("../factory/departmentFactory");
 const plantFactory = require("../factory/plantFactory");
+const db = require("../db/connect_db");
+const { departmentSchema, workCenterSchema } = require("../models/Schema");
+const { and, eq, inArray } = require("drizzle-orm");
 const {
   parsePagination,
   buildPaginationMeta,
@@ -19,34 +21,17 @@ const validatePlantAndDepartment = async (plantId, depId) => {
     throw new Error("Plant not found");
   }
 
-  const department = await departmentFactory.getDepartmentByIdAndPlantId(depId, plantId);
+  const department = await db.query.departmentSchema.findFirst({
+    where: and(
+      eq(departmentSchema.id, depId),
+      eq(departmentSchema.plantId, plantId),
+    ),
+  });
   if (!department) {
     throw new Error("Department does not belong to the selected plant");
   }
 };
 
-const validateWorkCenterAssignments = async (workCenterIds, plantId, depId) => {
-  if (workCenterIds.length === 0) {
-    return [];
-  }
-
-  const workCenters = await costCenterFactory.getWorkCentersByIds(workCenterIds);
-  if (workCenters.length !== workCenterIds.length) {
-    throw new Error("Some work centers were not found");
-  }
-
-  const hasMismatch = workCenters.some(
-    (workCenter) => workCenter.plantId !== plantId || workCenter.depId !== depId
-  );
-
-  if (hasMismatch) {
-    throw new Error(
-      "Work centers must belong to the same selected plant and department"
-    );
-  }
-
-  return workCenters;
-};
 
 const getCostCenters = async (query) => {
   const { page, limit, offset } = parsePagination(query);
@@ -75,7 +60,6 @@ const createCostCenter = async (body) => {
   const workCenterIds = normalizeIds(body.workCenterIds);
 
   await validatePlantAndDepartment(plantId, depId);
-  await validateWorkCenterAssignments(workCenterIds, plantId, depId);
 
   const createdCostCenter = await costCenterFactory.createCostCenter({
     plantId,
@@ -86,10 +70,7 @@ const createCostCenter = async (body) => {
   });
 
   if (workCenterIds.length > 0) {
-    await costCenterFactory.assignCostCenterToWorkCenters(
-      workCenterIds,
-      createdCostCenter.id
-    );
+    await assignWorkCentersDirect(workCenterIds, createdCostCenter.id);
   }
 
   return createdCostCenter;
@@ -110,10 +91,6 @@ const updateCostCenter = async (id, body) => {
 
   await validatePlantAndDepartment(nextPlantId, nextDepId);
 
-  if (workCenterIds) {
-    await validateWorkCenterAssignments(workCenterIds, nextPlantId, nextDepId);
-  }
-
   const payload = { ...body };
   if (payload.depId) {
     payload.depId = Number(payload.depId);
@@ -123,8 +100,8 @@ const updateCostCenter = async (id, body) => {
   await costCenterFactory.updateCostCenter(costCenterId, payload);
 
   if (workCenterIds) {
-    await costCenterFactory.assignCostCenterToWorkCenters(workCenterIds, costCenterId);
-    await costCenterFactory.removeCostCenterFromWorkCenters(costCenterId, workCenterIds);
+    await assignWorkCentersDirect(workCenterIds, costCenterId);
+    await clearRemovedWorkCentersDirect(costCenterId, workCenterIds);
   }
 };
 
@@ -136,6 +113,36 @@ const deleteCostCenter = async (id) => {
   }
 
   return costCenterFactory.deleteCostCenter(costCenterId);
+};
+
+const assignWorkCentersDirect = async (workCenterIds, costCenterId) => {
+  if (!workCenterIds || workCenterIds.length === 0) {
+    return;
+  }
+
+  await db
+    .update(workCenterSchema)
+    .set({ costCenterId })
+    .where(inArray(workCenterSchema.id, workCenterIds));
+};
+
+const clearRemovedWorkCentersDirect = async (costCenterId, keepIds = []) => {
+  const existing = await db
+    .select({ id: workCenterSchema.id })
+    .from(workCenterSchema)
+    .where(eq(workCenterSchema.costCenterId, costCenterId));
+
+  const existingIds = existing.map((row) => row.id);
+  const toClear = existingIds.filter((id) => !keepIds.includes(id));
+
+  if (toClear.length === 0) {
+    return;
+  }
+
+  await db
+    .update(workCenterSchema)
+    .set({ costCenterId: null })
+    .where(inArray(workCenterSchema.id, toClear));
 };
 
 module.exports = {

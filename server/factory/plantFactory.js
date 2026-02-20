@@ -42,7 +42,10 @@ const getTotalPlants = async (filters = {}) => {
 };
 
 const getPlantById = async (id) => {
-  const result = await db.select().from(plantSchema).where(eq(plantSchema.id, id));
+  const result = await db
+    .select()
+    .from(plantSchema)
+    .where(eq(plantSchema.id, id));
   return result[0] || null;
 };
 
@@ -51,7 +54,6 @@ const getPlantSelections = async () => {
     .select({
       id: plantSchema.id,
       name: plantSchema.name,
-      code: plantSchema.code,
     })
     .from(plantSchema);
 };

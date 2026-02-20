@@ -1,6 +1,10 @@
 const { and, eq, ilike, inArray, or, sql } = require("drizzle-orm");
 const db = require("../db/connect_db");
-const { costCenterSchema, plantSchema, workCenterSchema } = require("../models/Schema");
+const {
+  costCenterSchema,
+  plantSchema,
+  workCenterSchema,
+} = require("../models/Schema");
 
 const buildCostCenterWhere = (filters = {}) => {
   const conditions = [];
@@ -93,44 +97,6 @@ const deleteCostCenter = async (id) => {
   return db.delete(costCenterSchema).where(eq(costCenterSchema.id, id));
 };
 
-const getWorkCentersByIds = async (ids) => {
-  if (!ids || ids.length === 0) {
-    return [];
-  }
-  return db.query.workCenterSchema.findMany({
-    where: inArray(workCenterSchema.id, ids),
-  });
-};
-
-const assignCostCenterToWorkCenters = async (workCenterIds, costCenterId) => {
-  if (!workCenterIds || workCenterIds.length === 0) {
-    return;
-  }
-  return db
-    .update(workCenterSchema)
-    .set({ costCenterId })
-    .where(inArray(workCenterSchema.id, workCenterIds));
-};
-
-const removeCostCenterFromWorkCenters = async (costCenterId, keepIds = []) => {
-  const existing = await db
-    .select({ id: workCenterSchema.id })
-    .from(workCenterSchema)
-    .where(eq(workCenterSchema.costCenterId, costCenterId));
-
-  const existingIds = existing.map((row) => row.id);
-  const toClear = existingIds.filter((id) => !keepIds.includes(id));
-
-  if (toClear.length === 0) {
-    return;
-  }
-
-  return db
-    .update(workCenterSchema)
-    .set({ costCenterId: null })
-    .where(inArray(workCenterSchema.id, toClear));
-};
-
 module.exports = {
   getCostCenters,
   getTotalCostCenters,
@@ -138,7 +104,4 @@ module.exports = {
   createCostCenter,
   updateCostCenter,
   deleteCostCenter,
-  getWorkCentersByIds,
-  assignCostCenterToWorkCenters,
-  removeCostCenterFromWorkCenters,
 };

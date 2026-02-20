@@ -82,7 +82,10 @@ const createWorkCenter = async (data) => {
 };
 
 const updateWorkCenter = async (id, data) => {
-  return db.update(workCenterSchema).set(data).where(eq(workCenterSchema.id, id));
+  return db
+    .update(workCenterSchema)
+    .set(data)
+    .where(eq(workCenterSchema.id, id));
 };
 
 const deleteWorkCenter = async (id) => {
@@ -102,18 +105,18 @@ const getWorkCenterSelections = async (filters = {}) => {
     conditions.length === 0
       ? undefined
       : conditions.length === 1
-      ? conditions[0]
-      : and(...conditions);
+        ? conditions[0]
+        : and(...conditions);
 
   return db.query.workCenterSchema.findMany({
     where: whereCondition,
     columns: {
       id: true,
-      plantId: true,
-      depId: true,
-      costCenterId: true,
+      // plantId: true,
+      // depId: true,
+      // costCenterId: true,
       workName: true,
-      workCode: true,
+      // workCode: true,
     },
   });
 };

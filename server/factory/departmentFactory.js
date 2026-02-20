@@ -71,22 +71,13 @@ const getDepartmentById = async (id) => {
   );
 };
 
-const getDepartmentByIdAndPlantId = async (id, plantId) => {
-  return (
-    (await db.query.departmentSchema.findFirst({
-      where: and(eq(departmentSchema.id, id), eq(departmentSchema.plantId, plantId)),
-    })) || null
-  );
-};
-
 const getDepartmentSelections = async (plantId) => {
   return db.query.departmentSchema.findMany({
     where: plantId ? eq(departmentSchema.plantId, plantId) : undefined,
     columns: {
       id: true,
-      plantId: true,
+      // plantId: true,
       depName: true,
-      depCode: true,
     },
   });
 };
@@ -96,7 +87,10 @@ const createDepartment = async (data) => {
 };
 
 const updateDepartment = async (id, data) => {
-  return db.update(departmentSchema).set(data).where(eq(departmentSchema.id, id));
+  return db
+    .update(departmentSchema)
+    .set(data)
+    .where(eq(departmentSchema.id, id));
 };
 
 const deleteDepartment = async (id) => {
@@ -107,7 +101,6 @@ module.exports = {
   getDepartments,
   getTotalDepartments,
   getDepartmentById,
-  getDepartmentByIdAndPlantId,
   getDepartmentSelections,
   createDepartment,
   updateDepartment,

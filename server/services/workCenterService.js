@@ -1,7 +1,9 @@
 const workCenterFactory = require("../factory/workCenterFactory");
 const plantFactory = require("../factory/plantFactory");
-const departmentFactory = require("../factory/departmentFactory");
 const costCenterFactory = require("../factory/costCenterFactory");
+const db = require("../db/connect_db");
+const { departmentSchema } = require("../models/Schema");
+const { and, eq } = require("drizzle-orm");
 const {
   parsePagination,
   buildPaginationMeta,
@@ -13,13 +15,18 @@ const validatePlantAndDepartment = async (plantId, depId) => {
     throw new Error("Plant not found");
   }
 
-  const department = await departmentFactory.getDepartmentByIdAndPlantId(depId, plantId);
+  const department = await db.query.departmentSchema.findFirst({
+    where: and(
+      eq(departmentSchema.id, depId),
+      eq(departmentSchema.plantId, plantId),
+    ),
+  });
   if (!department) {
     throw new Error("Department does not belong to the selected plant");
   }
 };
 
-const validateCostCenter = async (costCenterId, plantId, depId) => {
+const validateCostCenter = async (costCenterId, depId) => {
   if (!costCenterId) {
     return;
   }
@@ -29,8 +36,8 @@ const validateCostCenter = async (costCenterId, plantId, depId) => {
     throw new Error("Cost center not found");
   }
 
-  if (costCenter.plantId !== plantId || costCenter.depId !== depId) {
-    throw new Error("Cost center must belong to the same plant and department");
+  if (costCenter.depId !== depId) {
+    throw new Error("Cost center must belong to the selected department");
   }
 };
 
@@ -73,7 +80,7 @@ const createWorkCenter = async (body) => {
   const costCenterId = body.costCenterId ? Number(body.costCenterId) : null;
 
   await validatePlantAndDepartment(plantId, depId);
-  await validateCostCenter(costCenterId, plantId, depId);
+  await validateCostCenter(costCenterId, depId);
 
   return workCenterFactory.createWorkCenter({
     plantId,
@@ -94,22 +101,19 @@ const updateWorkCenter = async (id, body) => {
 
   const nextPlantId = body.plantId || existingWorkCenter.plantId;
   const nextDepId = body.depId ? Number(body.depId) : existingWorkCenter.depId;
-  const nextCostCenterId =
-    body.costCenterId !== undefined
-      ? body.costCenterId
-        ? Number(body.costCenterId)
-        : null
-      : existingWorkCenter.costCenterId;
 
   await validatePlantAndDepartment(nextPlantId, nextDepId);
-  await validateCostCenter(nextCostCenterId, nextPlantId, nextDepId);
 
   const payload = { ...body };
   if (payload.depId) {
     payload.depId = Number(payload.depId);
   }
+
   if (payload.costCenterId !== undefined) {
     payload.costCenterId = payload.costCenterId ? Number(payload.costCenterId) : null;
+    await validateCostCenter(payload.costCenterId, nextDepId);
+  } else if (body.depId !== undefined || body.plantId !== undefined) {
+    payload.costCenterId = null;
   }
 
   return workCenterFactory.updateWorkCenter(workCenterId, payload);
