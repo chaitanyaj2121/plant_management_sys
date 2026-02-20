@@ -170,54 +170,78 @@ const DepartmentSetup = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
             <form onSubmit={submitForm} className="flex flex-col gap-5">
-              <select
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                value={form.plantId}
-                onMouseDown={() => fetchPlants(true)}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, plantId: e.target.value }))
-                }
-                required
-              >
-                <option value="">Select Plant</option>
-                {plants.map((plant) => (
-                  <option key={plant.id} value={plant.id}>
-                    {plant.name}
-                  </option>
-                ))}
-              </select>
+              <p className="text-xs text-gray-500">
+                <span className="text-red-500">*</span> Required fields
+              </p>
 
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                placeholder="Department Name"
-                value={form.depName}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, depName: e.target.value }))
-                }
-                required
-              />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Plant <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  value={form.plantId}
+                  onMouseDown={() => fetchPlants(true)}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, plantId: e.target.value }))
+                  }
+                  required
+                >
+                  <option value="">Select Plant</option>
+                  {plants.map((plant) => (
+                    <option key={plant.id} value={plant.id}>
+                      {plant.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                placeholder="Department Code"
-                value={form.depCode}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, depCode: e.target.value }))
-                }
-                required
-              />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Department Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  placeholder="Department Name"
+                  value={form.depName}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, depName: e.target.value }))
+                  }
+                  required
+                />
+              </div>
 
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                placeholder="Description"
-                value={form.depDescription}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    depDescription: e.target.value,
-                  }))
-                }
-              />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Department Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  placeholder="Department Code"
+                  value={form.depCode}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, depCode: e.target.value }))
+                  }
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Description
+                </label>
+                <input
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  placeholder="Description"
+                  value={form.depDescription}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      depDescription: e.target.value,
+                    }))
+                  }
+                />
+              </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button

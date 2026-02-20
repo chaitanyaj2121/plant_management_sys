@@ -168,9 +168,12 @@ const PlantSetup = () => {
             </div>
 
             <form onSubmit={onSubmit} className="p-6 space-y-4">
+              <p className="text-xs text-gray-500">
+                <span className="text-red-500">*</span> Required fields
+              </p>
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Plant Name
+                  Plant Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
@@ -199,7 +202,7 @@ const PlantSetup = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">
-                  Code
+                  Code <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
@@ -356,4 +359,3 @@ const PlantSetup = () => {
 };
 
 export default PlantSetup;
-

@@ -273,95 +273,129 @@ const CostCenterSetup = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
             <form onSubmit={onSubmit} className="flex flex-col gap-5">
-              <select
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                value={form.plantId}
-                onMouseDown={onPlantDropdownFocus}
-                onChange={(e) => onPlantChange(e.target.value)}
-                required
-              >
-                <option value="">Select Plant</option>
-                {plants.map((plant) => (
-                  <option key={plant.id} value={plant.id}>
-                    {plant.name}
-                  </option>
-                ))}
-              </select>
+              <p className="text-xs text-gray-500">
+                <span className="text-red-500">*</span> Required fields
+              </p>
 
-              <select
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
-                value={form.depId}
-                onMouseDown={onDepartmentDropdownFocus}
-                onChange={(e) => onDepartmentChange(e.target.value)}
-                required
-                disabled={!form.plantId}
-              >
-                <option value="">Select Department</option>
-                {departments.map((department) => (
-                  <option key={department.id} value={department.id}>
-                    {department.depName}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Plant <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  value={form.plantId}
+                  onMouseDown={onPlantDropdownFocus}
+                  onChange={(e) => onPlantChange(e.target.value)}
+                  required
+                >
+                  <option value="">Select Plant</option>
+                  {plants.map((plant) => (
+                    <option key={plant.id} value={plant.id}>
+                      {plant.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                placeholder="Cost Center Name"
-                value={form.costCenterName}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    costCenterName: e.target.value,
-                  }))
-                }
-                required
-              />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Department <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  value={form.depId}
+                  onMouseDown={onDepartmentDropdownFocus}
+                  onChange={(e) => onDepartmentChange(e.target.value)}
+                  required
+                  disabled={!form.plantId}
+                >
+                  <option value="">Select Department</option>
+                  {departments.map((department) => (
+                    <option key={department.id} value={department.id}>
+                      {department.depName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                placeholder="Cost Center Code"
-                value={form.costCenterCode}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    costCenterCode: e.target.value,
-                  }))
-                }
-                required
-              />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Cost Center Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  placeholder="Cost Center Name"
+                  value={form.costCenterName}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      costCenterName: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
 
-              <input
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
-                placeholder="Description"
-                value={form.description}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-              />
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Cost Center Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  placeholder="Cost Center Code"
+                  value={form.costCenterCode}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      costCenterCode: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
 
-              <select
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
-                value={form.workCenterId}
-                onMouseDown={onWorkCenterDropdownFocus}
-                onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    workCenterId: e.target.value,
-                  }))
-                }
-                disabled={!form.depId}
-                required
-              >
-                <option value="">Select Work Center</option>
-                {workCenters.map((workCenter) => (
-                  <option key={workCenter.id} value={workCenter.id}>
-                    {workCenter.workName}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Description
+                </label>
+                <input
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  placeholder="Description"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Work Center <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  value={form.workCenterId}
+                  onMouseDown={onWorkCenterDropdownFocus}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      workCenterId: e.target.value,
+                    }))
+                  }
+                  disabled={!form.depId}
+                  required
+                >
+                  <option value="">Select Work Center</option>
+                  {workCenters.map((workCenter) => (
+                    <option key={workCenter.id} value={workCenter.id}>
+                      {workCenter.workName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
