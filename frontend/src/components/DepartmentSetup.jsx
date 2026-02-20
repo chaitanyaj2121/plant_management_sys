@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
+import PopupModal from "./PopupModal";
 
 const defaultLimit = 5;
 const rowsPerPageOptions = [5, 10, 20, 50];
@@ -23,8 +24,25 @@ const DepartmentSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    tone: "info",
+    confirmText: "OK",
+    cancelText: "",
+    onConfirm: null,
+  });
   const lastFetchKey = useRef("");
   const hasPlantSelectionsLoaded = useRef(false);
+
+  const openPopup = (config) => {
+    setPopup({ isOpen: true, ...config });
+  };
+
+  const closePopup = () => {
+    setPopup((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+  };
 
   const fetchPlants = async (force = false) => {
     if (!force && hasPlantSelectionsLoaded.current) {
@@ -36,7 +54,11 @@ const DepartmentSetup = () => {
       setPlants(data.plants || []);
       hasPlantSelectionsLoaded.current = true;
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     }
   };
 
@@ -51,7 +73,11 @@ const DepartmentSetup = () => {
       setTotalPages(data.pagination?.totalPages || 1);
       setTotalCount(data.pagination?.totalCount || 0);
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -79,17 +105,29 @@ const DepartmentSetup = () => {
     try {
       if (editingId) {
         await api.put(`/departments/${editingId}`, form);
-        alert("Department updated successfully");
+        openPopup({
+          title: "Success",
+          message: "Department updated successfully",
+          tone: "success",
+        });
       } else {
         await api.post("/departments", form);
-        alert("Department added successfully");
+        openPopup({
+          title: "Success",
+          message: "Department added successfully",
+          tone: "success",
+        });
       }
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
       fetchDepartments(page, debouncedSearchTerm, limit);
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     }
   };
   const onEdit = (department) => {
@@ -122,13 +160,30 @@ const DepartmentSetup = () => {
   };
 
   const onDelete = async (id) => {
-    try {
-      await api.delete(`/departments/${id}`);
-      alert("Department deleted successfully");
-      fetchDepartments(page, debouncedSearchTerm, limit);
-    } catch (error) {
-      alert(getErrorMessage(error));
-    }
+    openPopup({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this department?",
+      tone: "warning",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      onConfirm: async () => {
+        try {
+          await api.delete(`/departments/${id}`);
+          openPopup({
+            title: "Success",
+            message: "Department deleted successfully",
+            tone: "success",
+          });
+          fetchDepartments(page, debouncedSearchTerm, limit);
+        } catch (error) {
+          openPopup({
+            title: "Error",
+            message: getErrorMessage(error),
+            tone: "error",
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -391,6 +446,23 @@ const DepartmentSetup = () => {
           Next →
         </button>
       </div>
+
+      <PopupModal
+        isOpen={popup.isOpen}
+        title={popup.title}
+        message={popup.message}
+        tone={popup.tone}
+        confirmText={popup.confirmText}
+        cancelText={popup.cancelText}
+        onCancel={closePopup}
+        onConfirm={async () => {
+          const action = popup.onConfirm;
+          closePopup();
+          if (action) {
+            await action();
+          }
+        }}
+      />
     </div>
   );
 };

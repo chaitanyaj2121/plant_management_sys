@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
+import PopupModal from "./PopupModal";
 
 const defaultForm = { name: "", des: "", code: "" };
 const defaultLimit = 5;
@@ -18,7 +19,24 @@ const PlantSetup = () => {
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    tone: "info",
+    confirmText: "OK",
+    cancelText: "",
+    onConfirm: null,
+  });
   const lastFetchKey = useRef("");
+
+  const openPopup = (config) => {
+    setPopup({ isOpen: true, ...config });
+  };
+
+  const closePopup = () => {
+    setPopup((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+  };
 
   const fetchPlants = async (targetPage, targetSearch, targetLimit) => {
     try {
@@ -31,7 +49,11 @@ const PlantSetup = () => {
       setTotalPages(data.totalPages || 1);
       setTotalCount(data.pagination?.totalCount || 0);
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -64,17 +86,29 @@ const PlantSetup = () => {
           des: form.des,
           code: form.code,
         });
-        alert("Plant updated successfully");
+        openPopup({
+          title: "Success",
+          message: "Plant updated successfully",
+          tone: "success",
+        });
       } else {
         await api.post("/plants", form);
-        alert("Plant added successfully");
+        openPopup({
+          title: "Success",
+          message: "Plant added successfully",
+          tone: "success",
+        });
       }
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
       fetchPlants(page, debouncedSearchTerm, limit);
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -94,7 +128,11 @@ const PlantSetup = () => {
       });
       setIsFormOpen(true);
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -113,13 +151,30 @@ const PlantSetup = () => {
   };
 
   const onDelete = async (id) => {
-    try {
-      await api.delete(`/plants/${id}`);
-      alert("Plant deleted successfully");
-      fetchPlants(page, debouncedSearchTerm, limit);
-    } catch (error) {
-      alert(getErrorMessage(error));
-    }
+    openPopup({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this plant?",
+      tone: "warning",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      onConfirm: async () => {
+        try {
+          await api.delete(`/plants/${id}`);
+          openPopup({
+            title: "Success",
+            message: "Plant deleted successfully",
+            tone: "success",
+          });
+          fetchPlants(page, debouncedSearchTerm, limit);
+        } catch (error) {
+          openPopup({
+            title: "Error",
+            message: getErrorMessage(error),
+            tone: "error",
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -354,6 +409,23 @@ const PlantSetup = () => {
           Next →
         </button>
       </div>
+
+      <PopupModal
+        isOpen={popup.isOpen}
+        title={popup.title}
+        message={popup.message}
+        tone={popup.tone}
+        confirmText={popup.confirmText}
+        cancelText={popup.cancelText}
+        onCancel={closePopup}
+        onConfirm={async () => {
+          const action = popup.onConfirm;
+          closePopup();
+          if (action) {
+            await action();
+          }
+        }}
+      />
     </div>
   );
 };

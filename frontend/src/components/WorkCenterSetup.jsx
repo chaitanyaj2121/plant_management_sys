@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import api, { getErrorMessage } from "../api/client";
+import PopupModal from "./PopupModal";
 
 const defaultLimit = 5;
 const rowsPerPageOptions = [5, 10, 20, 50];
@@ -25,9 +26,26 @@ const WorkCenterSetup = () => {
   const [form, setForm] = useState(defaultForm);
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    tone: "info",
+    confirmText: "OK",
+    cancelText: "",
+    onConfirm: null,
+  });
   const lastFetchKey = useRef("");
   const hasPlantSelectionsLoaded = useRef(false);
   const departmentsLoadedForPlant = useRef("");
+
+  const openPopup = (config) => {
+    setPopup({ isOpen: true, ...config });
+  };
+
+  const closePopup = () => {
+    setPopup((prev) => ({ ...prev, isOpen: false, onConfirm: null }));
+  };
 
   const fetchPlants = async (force = false) => {
     if (!force && hasPlantSelectionsLoaded.current) {
@@ -39,7 +57,11 @@ const WorkCenterSetup = () => {
       setPlants(data.plants || []);
       hasPlantSelectionsLoaded.current = true;
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     }
   };
 
@@ -62,7 +84,11 @@ const WorkCenterSetup = () => {
       setDepartments(data.departments || []);
       departmentsLoadedForPlant.current = plantId;
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     }
   };
 
@@ -77,7 +103,11 @@ const WorkCenterSetup = () => {
       setTotalPages(data.pagination?.totalPages || 1);
       setTotalCount(data.pagination?.totalCount || 0);
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     } finally {
       setLoading(false);
     }
@@ -124,10 +154,18 @@ const WorkCenterSetup = () => {
     try {
       if (editingId) {
         await api.put(`/work-centers/${editingId}`, form);
-        alert("Work center updated successfully");
+        openPopup({
+          title: "Success",
+          message: "Work center updated successfully",
+          tone: "success",
+        });
       } else {
         await api.post("/work-centers", form);
-        alert("Work center added successfully");
+        openPopup({
+          title: "Success",
+          message: "Work center added successfully",
+          tone: "success",
+        });
       }
 
       setEditingId(null);
@@ -135,7 +173,11 @@ const WorkCenterSetup = () => {
       setIsFormOpen(false);
       fetchWorkCenters(page, debouncedSearchTerm, limit);
     } catch (error) {
-      alert(getErrorMessage(error));
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
     }
   };
 
@@ -174,13 +216,30 @@ const WorkCenterSetup = () => {
   };
 
   const onDelete = async (id) => {
-    try {
-      await api.delete(`/work-centers/${id}`);
-      alert("Work center deleted successfully");
-      fetchWorkCenters(page, debouncedSearchTerm, limit);
-    } catch (error) {
-      alert(getErrorMessage(error));
-    }
+    openPopup({
+      title: "Confirm Delete",
+      message: "Are you sure you want to delete this work center?",
+      tone: "warning",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      onConfirm: async () => {
+        try {
+          await api.delete(`/work-centers/${id}`);
+          openPopup({
+            title: "Success",
+            message: "Work center deleted successfully",
+            tone: "success",
+          });
+          fetchWorkCenters(page, debouncedSearchTerm, limit);
+        } catch (error) {
+          openPopup({
+            title: "Error",
+            message: getErrorMessage(error),
+            tone: "error",
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -459,6 +518,23 @@ const WorkCenterSetup = () => {
           Next →
         </button>
       </div>
+
+      <PopupModal
+        isOpen={popup.isOpen}
+        title={popup.title}
+        message={popup.message}
+        tone={popup.tone}
+        confirmText={popup.confirmText}
+        cancelText={popup.cancelText}
+        onCancel={closePopup}
+        onConfirm={async () => {
+          const action = popup.onConfirm;
+          closePopup();
+          if (action) {
+            await action();
+          }
+        }}
+      />
     </div>
   );
 };
