@@ -380,6 +380,31 @@ const CostCenterSetup = () => {
                   ))}
                 </select>
               </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-600">
+                  Work Center <span className="text-red-500">*</span>
+                </label>
+                <select
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  value={form.workCenterId}
+                  onMouseDown={onWorkCenterDropdownFocus}
+                  onChange={(e) =>
+                    setForm((prev) => ({
+                      ...prev,
+                      workCenterId: e.target.value,
+                    }))
+                  }
+                  disabled={!form.depId}
+                  required
+                >
+                  <option value="">Select Work Center</option>
+                  {workCenters.map((workCenter) => (
+                    <option key={workCenter.id} value={workCenter.id}>
+                      {workCenter.workName}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-600">
@@ -432,32 +457,6 @@ const CostCenterSetup = () => {
                     }))
                   }
                 />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-gray-600">
-                  Work Center <span className="text-red-500">*</span>
-                </label>
-                <select
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  value={form.workCenterId}
-                  onMouseDown={onWorkCenterDropdownFocus}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      workCenterId: e.target.value,
-                    }))
-                  }
-                  disabled={!form.depId}
-                  required
-                >
-                  <option value="">Select Work Center</option>
-                  {workCenters.map((workCenter) => (
-                    <option key={workCenter.id} value={workCenter.id}>
-                      {workCenter.workName}
-                    </option>
-                  ))}
-                </select>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
@@ -621,8 +620,9 @@ const CostCenterSetup = () => {
         </span>
 
         <span className="text-sm text-gray-600">
-          Showing entries <span className="font-semibold">{costCenters.length}</span>{" "}
-          out of <span className="font-semibold">{totalCount}</span>
+          Showing entries{" "}
+          <span className="font-semibold">{costCenters.length}</span> out of{" "}
+          <span className="font-semibold">{totalCount}</span>
         </span>
 
         <button
@@ -656,4 +656,3 @@ const CostCenterSetup = () => {
 };
 
 export default CostCenterSetup;
-
