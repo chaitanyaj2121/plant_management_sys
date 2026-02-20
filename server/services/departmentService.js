@@ -26,6 +26,17 @@ const getDepartmentSelections = async (query) => {
   return { departments };
 };
 
+const getDepartmentById = async (id) => {
+  const departmentId = Number(id);
+  const department = await departmentFactory.getDepartmentById(departmentId);
+
+  if (!department) {
+    throw new Error("Department not found");
+  }
+
+  return { department };
+};
+
 const createDepartment = async (body) => {
   if (!body.plantId || !body.depName) {
     throw new Error("plantId and depName are required");
@@ -74,6 +85,7 @@ const deleteDepartment = async (id) => {
 module.exports = {
   getDepartments,
   getDepartmentSelections,
+  getDepartmentById,
   createDepartment,
   updateDepartment,
   deleteDepartment,

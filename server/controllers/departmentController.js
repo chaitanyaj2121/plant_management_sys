@@ -18,6 +18,17 @@ const getDepartmentSelections = async (req, res) => {
   }
 };
 
+const getDepartmentById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await departmentService.getDepartmentById(id);
+    res.status(200).json(result);
+  } catch (err) {
+    const statusCode = err.message === "Department not found" ? 404 : 400;
+    res.status(statusCode).json({ error: err.message });
+  }
+};
+
 const createDepartment = async (req, res) => {
   try {
     await departmentService.createDepartment(req.body);
@@ -50,6 +61,7 @@ const deleteDepartment = async (req, res) => {
 module.exports = {
   getDepartments,
   getDepartmentSelections,
+  getDepartmentById,
   createDepartment,
   updateDepartment,
   deleteDepartment,

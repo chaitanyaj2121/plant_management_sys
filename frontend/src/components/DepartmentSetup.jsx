@@ -130,21 +130,35 @@ const DepartmentSetup = () => {
       });
     }
   };
-  const onEdit = (department) => {
-    setEditingId(department.id);
-    setForm({
-      plantId: department.plantId || "",
-      depName: department.depName || "",
-      depCode: department.depCode || "",
-      depDescription: department.depDescription || "",
-    });
+  const onEdit = async (department) => {
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/departments/${department.id}`);
+      const selectedDepartment = data?.department || department;
 
-    if (department.plant) {
-      setPlants([department.plant]);
-      hasPlantSelectionsLoaded.current = false;
+      setEditingId(selectedDepartment.id || department.id);
+      setForm({
+        plantId: selectedDepartment.plantId || "",
+        depName: selectedDepartment.depName || "",
+        depCode: selectedDepartment.depCode || "",
+        depDescription: selectedDepartment.depDescription || "",
+      });
+
+      if (selectedDepartment.plant) {
+        setPlants([selectedDepartment.plant]);
+        hasPlantSelectionsLoaded.current = false;
+      }
+
+      setIsFormOpen(true);
+    } catch (error) {
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
+    } finally {
+      setLoading(false);
     }
-
-    setIsFormOpen(true);
   };
 
   const onAdd = () => {

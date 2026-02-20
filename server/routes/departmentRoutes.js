@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get("/", departmentController.getDepartments);
 router.get("/selections", departmentController.getDepartmentSelections);
+router.get("/:id", departmentController.getDepartmentById);
 router.post("/", departmentController.createDepartment);
 router.put("/:id", departmentController.updateDepartment);
 router.delete("/:id", departmentController.deleteDepartment);
