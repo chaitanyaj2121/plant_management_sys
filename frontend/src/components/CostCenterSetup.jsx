@@ -127,34 +127,33 @@ const CostCenterSetup = () => {
 
   const onPlantChange = (plantId) => {
     setForm((prev) => ({ ...prev, plantId, depId: "", workCenterId: "" }));
+    // Do NOT fetch departments here — only fetch when user clicks the dept dropdown
     setDepartments([]);
     setWorkCenters([]);
     departmentsLoadedForPlant.current = "";
     workCentersLoadedForKey.current = "";
-    fetchDepartments(plantId);
   };
 
   const onDepartmentChange = (depId) => {
     setForm((prev) => ({ ...prev, depId, workCenterId: "" }));
+    // Do NOT fetch work centers here — only fetch when user clicks the work center dropdown
     setWorkCenters([]);
     workCentersLoadedForKey.current = "";
-    fetchWorkCenters(form.plantId, depId);
   };
 
   const onPlantDropdownFocus = () => {
-    fetchPlants();
+    fetchPlants(true);
   };
 
   const onDepartmentDropdownFocus = () => {
     if (!form.plantId) return;
-    fetchDepartments(form.plantId);
+    fetchDepartments(form.plantId, true);
   };
 
   const onWorkCenterDropdownFocus = () => {
     if (!form.plantId || !form.depId) return;
-    fetchWorkCenters(form.plantId, form.depId);
+    fetchWorkCenters(form.plantId, form.depId, true);
   };
-
   const onSubmit = async (event) => {
     event.preventDefault();
     try {

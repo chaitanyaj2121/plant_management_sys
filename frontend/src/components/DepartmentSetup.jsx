@@ -157,7 +157,7 @@ const DepartmentSetup = () => {
               <select
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                 value={form.plantId}
-                onFocus={() => fetchPlants()}
+                onMouseDown={() => fetchPlants(true)}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, plantId: e.target.value }))
                 }
