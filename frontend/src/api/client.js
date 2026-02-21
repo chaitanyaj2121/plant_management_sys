@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://localhost:4000/api";
 const TOKEN_STORAGE_KEY = "auth_token";
 const USER_STORAGE_KEY = "auth_user";
 
@@ -78,4 +79,3 @@ export const registerUser = async (payload) => {
 };
 
 export default api;
-

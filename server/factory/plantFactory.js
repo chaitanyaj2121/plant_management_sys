@@ -65,7 +65,7 @@ const getPlantSelections = async () => {
 
 const createPlant = async (data) => {
   const existingPlant = await db.query.plantSchema.findFirst({
-    where: eq(plantSchema.plantCode, data.plantCode),
+    where: eq(plantSchema.code, data.code),
   });
 
   if (existingPlant) {
@@ -76,9 +76,9 @@ const createPlant = async (data) => {
 };
 
 const updatePlant = async (id, data) => {
-  if (data.plantCode) {
+  if (data.code) {
     const existingPlant = await db.query.plantSchema.findFirst({
-      where: eq(plantSchema.plantCode, data.plantCode),
+      where: eq(plantSchema.code, data.code),
     });
 
     if (existingPlant && existingPlant.id !== id) {
