@@ -26,6 +26,7 @@ const CostCenterSetup = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [popup, setPopup] = useState({
@@ -168,6 +169,12 @@ const CostCenterSetup = () => {
     setWorkCenters([]);
     departmentsLoadedForPlant.current = "";
     workCentersLoadedForKey.current = "";
+    setFieldErrors((prev) => ({
+      ...prev,
+      plantId: undefined,
+      depId: undefined,
+      workCenterId: undefined,
+    }));
   };
 
   const onDepartmentChange = (depId) => {
@@ -175,6 +182,7 @@ const CostCenterSetup = () => {
     // Do NOT fetch work centers here — only fetch when user clicks the work center dropdown
     setWorkCenters([]);
     workCentersLoadedForKey.current = "";
+    setFieldErrors((prev) => ({ ...prev, depId: undefined, workCenterId: undefined }));
   };
 
   const onPlantDropdownFocus = () => {
@@ -192,9 +200,35 @@ const CostCenterSetup = () => {
   };
   const onSubmit = async (event) => {
     event.preventDefault();
+    const errors = {};
+    if (!form.plantId) {
+      errors.plantId = "Plant is required";
+    }
+    if (!form.depId) {
+      errors.depId = "Department is required";
+    }
+    if (!form.workCenterId) {
+      errors.workCenterId = "Work center is required";
+    }
+    if (!form.costCenterName.trim()) {
+      errors.costCenterName = "Cost center name is required";
+    }
+    const costCodeValue = form.costCenterCode?.toString().trim();
+    if (!costCodeValue) {
+      errors.costCenterCode = "Cost center code is required";
+    } else if (!/^\d+$/.test(costCodeValue)) {
+      errors.costCenterCode = "Cost center code must contain only digits";
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     try {
       const payload = {
         ...form,
+        costCenterName: form.costCenterName.trim(),
+        costCenterCode: costCodeValue,
         workCenterId: form.workCenterId ? Number(form.workCenterId) : null,
       };
 
@@ -205,6 +239,7 @@ const CostCenterSetup = () => {
       }
       setEditingId(null);
       setForm(defaultForm);
+      setFieldErrors({});
       setIsFormOpen(false);
       setPage(1);
       fetchCostCenters(1, debouncedSearchTerm, limit);
@@ -234,6 +269,7 @@ const CostCenterSetup = () => {
         description: selectedCostCenter.description || "",
         workCenterId: selectedWorkCenterId,
       });
+      setFieldErrors({});
 
       if (selectedCostCenter.plant) {
         setPlants([selectedCostCenter.plant]);
@@ -263,12 +299,14 @@ const CostCenterSetup = () => {
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(false);
   };
 
@@ -337,7 +375,7 @@ const CostCenterSetup = () => {
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
-            <form onSubmit={onSubmit} className="flex flex-col gap-5">
+            <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
               <p className="text-xs text-gray-500">
                 <span className="text-red-500">*</span> Required fields
               </p>
@@ -351,7 +389,6 @@ const CostCenterSetup = () => {
                   value={form.plantId}
                   onMouseDown={onPlantDropdownFocus}
                   onChange={(e) => onPlantChange(e.target.value)}
-                  required
                 >
                   <option value="">Select Plant</option>
                   {plants.map((plant) => (
@@ -360,6 +397,9 @@ const CostCenterSetup = () => {
                     </option>
                   ))}
                 </select>
+                {fieldErrors.plantId ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.plantId}</p>
+                ) : null}
               </div>
 
               <div>
@@ -371,7 +411,6 @@ const CostCenterSetup = () => {
                   value={form.depId}
                   onMouseDown={onDepartmentDropdownFocus}
                   onChange={(e) => onDepartmentChange(e.target.value)}
-                  required
                   disabled={!form.plantId}
                 >
                   <option value="">Select Department</option>
@@ -381,6 +420,9 @@ const CostCenterSetup = () => {
                     </option>
                   ))}
                 </select>
+                {fieldErrors.depId ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.depId}</p>
+                ) : null}
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-600">
@@ -397,7 +439,6 @@ const CostCenterSetup = () => {
                     }))
                   }
                   disabled={!form.depId}
-                  required
                 >
                   <option value="">Select Work Center</option>
                   {workCenters.map((workCenter) => (
@@ -406,6 +447,9 @@ const CostCenterSetup = () => {
                     </option>
                   ))}
                 </select>
+                {fieldErrors.workCenterId ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.workCenterId}</p>
+                ) : null}
               </div>
 
               <div>
@@ -416,14 +460,22 @@ const CostCenterSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Cost Center Name"
                   value={form.costCenterName}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setForm((prev) => ({
                       ...prev,
                       costCenterName: e.target.value,
-                    }))
-                  }
-                  required
+                    }));
+                    if (fieldErrors.costCenterName) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        costCenterName: undefined,
+                      }));
+                    }
+                  }}
                 />
+                {fieldErrors.costCenterName ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.costCenterName}</p>
+                ) : null}
               </div>
 
               <div>
@@ -435,14 +487,22 @@ const CostCenterSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Cost Center Code"
                   value={form.costCenterCode}
-                  onChange={(e) =>
+                  onChange={(e) => {
                     setForm((prev) => ({
                       ...prev,
                       costCenterCode: e.target.value,
-                    }))
-                  }
-                  required
+                    }));
+                    if (fieldErrors.costCenterCode) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        costCenterCode: undefined,
+                      }));
+                    }
+                  }}
                 />
+                {fieldErrors.costCenterCode ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.costCenterCode}</p>
+                ) : null}
               </div>
 
               <div>

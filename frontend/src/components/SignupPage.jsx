@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getErrorMessage, registerUser } from "../api/client";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -169,6 +169,13 @@ const SignupPage = () => {
           {submitting ? "Creating account..." : "Sign Up"}
         </button>
       </form>
+
+      <p className="mt-4 text-center text-sm text-gray-600">
+        Already have an account?{" "}
+        <Link className="font-medium text-blue-600 hover:text-blue-700" to="/login">
+          Login
+        </Link>
+      </p>
     </div>
   );
 };
