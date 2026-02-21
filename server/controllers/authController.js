@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../db/connect_db.js");
-const { user } = require("../models/Schema.js");
+const { userSchema } = require("../models/Schema.js");
 const { eq } = require("drizzle-orm");
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
@@ -14,8 +14,8 @@ const register = async (req, res) => {
     // Check if user already exists
     const existingUser = await db
       .select()
-      .from(user)
-      .where(eq(user.email, email));
+      .from(userSchema)
+      .where(eq(userSchema.email, email));
     if (existingUser.length > 0) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -26,7 +26,7 @@ const register = async (req, res) => {
 
     // Create new user
     const newUser = await db
-      .insert(user)
+      .insert(userSchema)
       .values({
         name,
         email,
@@ -64,8 +64,8 @@ const login = async (req, res) => {
     // Check if user exists
     const existingUser = await db
       .select()
-      .from(user)
-      .where(eq(user.email, email));
+      .from(userSchema)
+      .where(eq(userSchema.email, email));
     if (existingUser.length === 0) {
       return res.status(404).json({
         message: "User not found",
@@ -121,4 +121,10 @@ const authenticateToken = (req, res, next) => {
     req.user = user;
     next();
   });
+};
+
+module.exports = {
+  register,
+  login,
+  authenticateToken,
 };
