@@ -90,7 +90,7 @@ const createCostCenter = async (data) => {
 const updateCostCenter = async (id, data) => {
   return db
     .update(costCenterSchema)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: sql`now()` })
     .where(eq(costCenterSchema.id, id));
 };
 

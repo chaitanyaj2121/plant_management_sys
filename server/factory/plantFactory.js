@@ -70,7 +70,7 @@ const createPlant = async (data) => {
 const updatePlant = async (id, data) => {
   return await db
     .update(plantSchema)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: sql`now()` })
     .where(eq(plantSchema.id, id));
 };
 

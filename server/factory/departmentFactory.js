@@ -94,7 +94,7 @@ const createDepartment = async (data) => {
 const updateDepartment = async (id, data) => {
   return db
     .update(departmentSchema)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: sql`now()` })
     .where(eq(departmentSchema.id, id));
 };
 

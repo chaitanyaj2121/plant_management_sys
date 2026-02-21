@@ -86,7 +86,7 @@ const createWorkCenter = async (data) => {
 const updateWorkCenter = async (id, data) => {
   return db
     .update(workCenterSchema)
-    .set({ ...data, updatedAt: new Date() })
+    .set({ ...data, updatedAt: sql`now()` })
     .where(eq(workCenterSchema.id, id));
 };
 
