@@ -192,7 +192,7 @@ const PlantSetup = () => {
             }}
           />
           <button
-            className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg border border-gray-400 px-3 py-2 text-sm font-semibold text-gray-800 bg-gray-50 transition hover:bg-gray-200 hover:border-gray-500 disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
             type="button"
             onClick={() => {
               setPage(1);
@@ -201,7 +201,7 @@ const PlantSetup = () => {
             }}
             disabled={!searchTerm.trim()}
           >
-            Clear
+            <span className="text-lg leading-none">&times;</span>
           </button>
         </div>
         <button
