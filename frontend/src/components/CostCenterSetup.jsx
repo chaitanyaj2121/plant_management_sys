@@ -201,18 +201,8 @@ const CostCenterSetup = () => {
 
       if (editingId) {
         await api.put(`/cost-centers/${editingId}`, payload);
-        openPopup({
-          title: "Success",
-          message: "Cost center updated successfully",
-          tone: "success",
-        });
       } else {
         await api.post("/cost-centers", payload);
-        openPopup({
-          title: "Success",
-          message: "Cost center added successfully",
-          tone: "success",
-        });
       }
       setEditingId(null);
       setForm(defaultForm);

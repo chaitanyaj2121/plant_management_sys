@@ -86,18 +86,8 @@ const PlantSetup = () => {
           des: form.des,
           code: form.code,
         });
-        openPopup({
-          title: "Success",
-          message: "Plant updated successfully",
-          tone: "success",
-        });
       } else {
         await api.post("/plants", form);
-        openPopup({
-          title: "Success",
-          message: "Plant added successfully",
-          tone: "success",
-        });
       }
       setForm(defaultForm);
       setEditingId(null);

@@ -154,18 +154,8 @@ const WorkCenterSetup = () => {
     try {
       if (editingId) {
         await api.put(`/work-centers/${editingId}`, form);
-        openPopup({
-          title: "Success",
-          message: "Work center updated successfully",
-          tone: "success",
-        });
       } else {
         await api.post("/work-centers", form);
-        openPopup({
-          title: "Success",
-          message: "Work center added successfully",
-          tone: "success",
-        });
       }
 
       setEditingId(null);

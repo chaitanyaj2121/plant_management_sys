@@ -105,18 +105,8 @@ const DepartmentSetup = () => {
     try {
       if (editingId) {
         await api.put(`/departments/${editingId}`, form);
-        openPopup({
-          title: "Success",
-          message: "Department updated successfully",
-          tone: "success",
-        });
       } else {
         await api.post("/departments", form);
-        openPopup({
-          title: "Success",
-          message: "Department added successfully",
-          tone: "success",
-        });
       }
       setForm(defaultForm);
       setEditingId(null);
