@@ -9,6 +9,17 @@ const getCostCenters = async (req, res) => {
   }
 };
 
+const getCostCenterById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await costCenterService.getCostCenterById(id);
+    res.status(200).json(result);
+  } catch (err) {
+    const statusCode = err.message === "Cost center not found" ? 404 : 400;
+    res.status(statusCode).json({ error: err.message });
+  }
+};
+
 const createCostCenter = async (req, res) => {
   try {
     const createdCostCenter = await costCenterService.createCostCenter(
@@ -45,6 +56,7 @@ const deleteCostCenter = async (req, res) => {
 
 module.exports = {
   getCostCenters,
+  getCostCenterById,
   createCostCenter,
   updateCostCenter,
   deleteCostCenter,

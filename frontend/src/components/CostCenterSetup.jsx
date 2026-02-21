@@ -228,34 +228,47 @@ const CostCenterSetup = () => {
   };
 
   const onEdit = async (row) => {
-    const selectedWorkCenterId = row.workCenters?.length
-      ? row.workCenters[0].id?.toString()
-      : "";
+    try {
+      setLoading(true);
+      const { data } = await api.get(`/cost-centers/${row.id}`);
+      const selectedCostCenter = data?.costCenter || row;
+      const selectedWorkCenterId = selectedCostCenter.workCenters?.length
+        ? selectedCostCenter.workCenters[0].id?.toString()
+        : "";
 
-    setEditingId(row.id);
-    setForm({
-      plantId: row.plantId || "",
-      depId: row.depId?.toString() || "",
-      costCenterName: row.costCenterName || "",
-      costCenterCode: row.costCenterCode || "",
-      description: row.description || "",
-      workCenterId: selectedWorkCenterId,
-    });
+      setEditingId(selectedCostCenter.id || row.id);
+      setForm({
+        plantId: selectedCostCenter.plantId || "",
+        depId: selectedCostCenter.depId?.toString() || "",
+        costCenterName: selectedCostCenter.costCenterName || "",
+        costCenterCode: selectedCostCenter.costCenterCode || "",
+        description: selectedCostCenter.description || "",
+        workCenterId: selectedWorkCenterId,
+      });
 
-    if (row.plant) {
-      setPlants([row.plant]);
-      hasPlantSelectionsLoaded.current = false;
-    }
-    if (row.department) {
-      setDepartments([row.department]);
-      departmentsLoadedForPlant.current = "";
-    }
-    if (row.workCenters?.length) {
-      setWorkCenters(row.workCenters);
-      workCentersLoadedForKey.current = "";
-    }
+      if (selectedCostCenter.plant) {
+        setPlants([selectedCostCenter.plant]);
+        hasPlantSelectionsLoaded.current = false;
+      }
+      if (selectedCostCenter.department) {
+        setDepartments([selectedCostCenter.department]);
+        departmentsLoadedForPlant.current = "";
+      }
+      if (selectedCostCenter.workCenters?.length) {
+        setWorkCenters(selectedCostCenter.workCenters);
+        workCentersLoadedForKey.current = "";
+      }
 
-    setIsFormOpen(true);
+      setIsFormOpen(true);
+    } catch (error) {
+      openPopup({
+        title: "Error",
+        message: getErrorMessage(error),
+        tone: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onAdd = () => {

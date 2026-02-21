@@ -50,6 +50,17 @@ const getCostCenters = async (query) => {
   };
 };
 
+const getCostCenterById = async (id) => {
+  const costCenterId = Number(id);
+  const costCenter = await costCenterFactory.getCostCenterById(costCenterId);
+
+  if (!costCenter) {
+    throw new Error("Cost center not found");
+  }
+
+  return { costCenter };
+};
+
 const createCostCenter = async (body) => {
   if (!body.plantId || !body.depId || !body.costCenterName) {
     throw new Error("plantId, depId and costCenterName are required");
@@ -147,6 +158,7 @@ const clearRemovedWorkCentersDirect = async (costCenterId, keepIds = []) => {
 
 module.exports = {
   getCostCenters,
+  getCostCenterById,
   createCostCenter,
   updateCostCenter,
   deleteCostCenter,

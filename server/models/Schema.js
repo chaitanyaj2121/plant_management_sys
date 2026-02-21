@@ -1,5 +1,13 @@
-const { numeric, integer, pgTable, varchar, uuid, serial, text, timestamp } =
-  require("drizzle-orm/pg-core");
+const {
+  numeric,
+  integer,
+  pgTable,
+  varchar,
+  uuid,
+  serial,
+  text,
+  timestamp,
+} = require("drizzle-orm/pg-core");
 const { relations } = require("drizzle-orm");
 
 const plantSchema = pgTable("plant", {
@@ -53,9 +61,12 @@ const workCenterSchema = pgTable("work_center", {
   depId: integer("dep_id").references(() => departmentSchema.id, {
     onDelete: "cascade",
   }),
-  costCenterId: integer("cost_center_id").references(() => costCenterSchema.id, {
-    onDelete: "set null",
-  }),
+  costCenterId: integer("cost_center_id").references(
+    () => costCenterSchema.id,
+    {
+      onDelete: "set null",
+    },
+  ),
   workName: varchar("work_name", { length: 255 }).notNull(),
   workCode: varchar("work_code", { length: 255 }).unique(),
   workDescription: text("work_description"),
