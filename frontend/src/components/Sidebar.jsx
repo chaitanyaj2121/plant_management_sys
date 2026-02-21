@@ -1,7 +1,11 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { clearAuthSession, getAuthUser } from "../api/client";
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const authUser = getAuthUser();
+  const loggedInUserName = authUser?.name || "User";
 
   const menuItems = [
     { name: "Plant", path: "/plant" },
@@ -45,8 +49,21 @@ const Sidebar = () => {
           </ul>
         </nav>
 
-        <div className="border-t border-gray-100 px-4 py-3 text-[11px] text-gray-400">
-          (c) 2026 Your Company
+        <div className="border-t border-gray-100 px-4 py-3">
+          <p className="text-xs font-medium text-gray-700 truncate" title={loggedInUserName}>
+            {loggedInUserName}
+          </p>
+          <button
+            type="button"
+            className="mt-2 w-full rounded-md border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 transition hover:bg-gray-100"
+            onClick={() => {
+              clearAuthSession();
+              navigate("/login", { replace: true });
+              window.location.assign("/login");
+            }}
+          >
+            Logout
+          </button>
         </div>
       </div>
     </aside>
