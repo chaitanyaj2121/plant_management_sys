@@ -57,7 +57,7 @@ const LoginPage = () => {
       <h1 className="text-2xl font-semibold text-gray-900">Sign In</h1>
       <p className="mt-1 text-sm text-gray-600">Use your account to continue.</p>
 
-      <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+      <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Email</label>
           <input
@@ -71,7 +71,6 @@ const LoginPage = () => {
                 setFieldErrors((prev) => ({ ...prev, email: undefined }));
               }
             }}
-            required
           />
           {fieldErrors.email ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
@@ -91,7 +90,6 @@ const LoginPage = () => {
                 setFieldErrors((prev) => ({ ...prev, password: undefined }));
               }
             }}
-            required
           />
           {fieldErrors.password ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>

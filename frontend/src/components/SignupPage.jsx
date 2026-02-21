@@ -76,7 +76,7 @@ const SignupPage = () => {
       <h1 className="text-2xl font-semibold text-gray-900">Create Account</h1>
       <p className="mt-1 text-sm text-gray-600">Register to access the dashboard.</p>
 
-      <form className="mt-6 space-y-4" onSubmit={onSubmit}>
+      <form className="mt-6 space-y-4" onSubmit={onSubmit} noValidate>
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">Name</label>
           <input
@@ -90,7 +90,6 @@ const SignupPage = () => {
                 setFieldErrors((prev) => ({ ...prev, name: undefined }));
               }
             }}
-            required
           />
           {fieldErrors.name ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.name}</p>
@@ -110,7 +109,6 @@ const SignupPage = () => {
                 setFieldErrors((prev) => ({ ...prev, email: undefined }));
               }
             }}
-            required
           />
           {fieldErrors.email ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
@@ -134,7 +132,6 @@ const SignupPage = () => {
                 }));
               }
             }}
-            required
           />
           {fieldErrors.password ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
@@ -156,7 +153,6 @@ const SignupPage = () => {
                 setFieldErrors((prev) => ({ ...prev, confirmPassword: undefined }));
               }
             }}
-            required
           />
           {fieldErrors.confirmPassword ? (
             <p className="mt-1 text-xs text-red-600">{fieldErrors.confirmPassword}</p>
