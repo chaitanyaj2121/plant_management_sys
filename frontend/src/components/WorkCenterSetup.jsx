@@ -180,10 +180,10 @@ const WorkCenterSetup = () => {
 
       setEditingId(selectedWorkCenter.id || row.id);
       setForm({
-        plantId: selectedWorkCenter.plantId || "",
+        plantId: selectedWorkCenter.plantId?.toString() || "",
         depId: selectedWorkCenter.depId?.toString() || "",
         workName: selectedWorkCenter.workName || "",
-        workCode: selectedWorkCenter.workCode || "",
+        workCode: selectedWorkCenter.workCode?.toString() || "",
         workDescription: selectedWorkCenter.workDescription || "",
       });
 
@@ -351,6 +351,7 @@ const WorkCenterSetup = () => {
                   Work Center Code <span className="text-red-500">*</span>
                 </label>
                 <input
+                  type="number"
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Work Center Code"
                   value={form.workCode}

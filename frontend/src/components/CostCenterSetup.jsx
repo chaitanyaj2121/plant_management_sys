@@ -195,9 +195,8 @@ const CostCenterSetup = () => {
     try {
       const payload = {
         ...form,
-        workCenterIds: form.workCenterId ? [Number(form.workCenterId)] : [],
+        workCenterId: form.workCenterId ? Number(form.workCenterId) : null,
       };
-      delete payload.workCenterId;
 
       if (editingId) {
         await api.put(`/cost-centers/${editingId}`, payload);
@@ -223,16 +222,15 @@ const CostCenterSetup = () => {
       setLoading(true);
       const { data } = await api.get(`/cost-centers/${row.id}`);
       const selectedCostCenter = data?.costCenter || row;
-      const selectedWorkCenterId = selectedCostCenter.workCenters?.length
-        ? selectedCostCenter.workCenters[0].id?.toString()
-        : "";
+      const selectedWorkCenterId =
+        selectedCostCenter.workCenter?.id?.toString() || "";
 
       setEditingId(selectedCostCenter.id || row.id);
       setForm({
-        plantId: selectedCostCenter.plantId || "",
+        plantId: selectedCostCenter.plantId?.toString() || "",
         depId: selectedCostCenter.depId?.toString() || "",
         costCenterName: selectedCostCenter.costCenterName || "",
-        costCenterCode: selectedCostCenter.costCenterCode || "",
+        costCenterCode: selectedCostCenter.costCenterCode?.toString() || "",
         description: selectedCostCenter.description || "",
         workCenterId: selectedWorkCenterId,
       });
@@ -245,8 +243,8 @@ const CostCenterSetup = () => {
         setDepartments([selectedCostCenter.department]);
         departmentsLoadedForPlant.current = "";
       }
-      if (selectedCostCenter.workCenters?.length) {
-        setWorkCenters(selectedCostCenter.workCenters);
+      if (selectedCostCenter.workCenter) {
+        setWorkCenters([selectedCostCenter.workCenter]);
         workCentersLoadedForKey.current = "";
       }
 
@@ -433,6 +431,7 @@ const CostCenterSetup = () => {
                   Cost Center Code <span className="text-red-500">*</span>
                 </label>
                 <input
+                  type="number"
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Cost Center Code"
                   value={form.costCenterCode}
@@ -540,21 +539,8 @@ const CostCenterSetup = () => {
                       {row.costCenterName}
                     </td>
                     <td className="px-6 py-4 text-gray-600 align-middle">
-                      <p
-                        className="truncate"
-                        title={
-                          row.workCenters?.length
-                            ? row.workCenters
-                                .map((item) => item.workName)
-                                .join(", ")
-                            : "-"
-                        }
-                      >
-                        {row.workCenters?.length
-                          ? row.workCenters
-                              .map((item) => item.workName)
-                              .join(", ")
-                          : "-"}
+                      <p className="truncate" title={row.workCenter?.workName || "-"}>
+                        {row.workCenter?.workName || "-"}
                       </p>
                     </td>
                     <td className="px-6 py-4 text-gray-600 align-middle truncate">
