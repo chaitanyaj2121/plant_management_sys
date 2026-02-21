@@ -80,6 +80,14 @@ const getCostCenterById = async (id) => {
 };
 
 const createCostCenter = async (data) => {
+  const existingCostCenter = await db.query.costCenterSchema.findFirst({
+    where: eq(costCenterSchema.costCenterCode, data.costCenterCode),
+  });
+
+  if (existingCostCenter) {
+    throw new Error("Cost center code already exists");
+  }
+
   const created = await db
     .insert(costCenterSchema)
     .values(data)
@@ -88,6 +96,16 @@ const createCostCenter = async (data) => {
 };
 
 const updateCostCenter = async (id, data) => {
+  if (data.costCenterCode) {
+    const existingCostCenter = await db.query.costCenterSchema.findFirst({
+      where: eq(costCenterSchema.costCenterCode, data.costCenterCode),
+    });
+
+    if (existingCostCenter && existingCostCenter.id !== id) {
+      throw new Error("Cost center code already exists");
+    }
+  }
+
   return db
     .update(costCenterSchema)
     .set({ ...data, updatedAt: sql`now()` })

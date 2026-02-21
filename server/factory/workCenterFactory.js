@@ -80,10 +80,28 @@ const getWorkCenterById = async (id) => {
 };
 
 const createWorkCenter = async (data) => {
-  return db.insert(workCenterSchema).values(data);
+  const existingWorkCenter = await db.query.workCenterSchema.findFirst({
+    where: eq(workCenterSchema.workCenterCode, data.workCenterCode),
+  });
+
+  if (existingWorkCenter) {
+    throw new Error("Work center code already exists");
+  }
+
+  return db.insert(workCenterSchema).values(data).returning();
 };
 
 const updateWorkCenter = async (id, data) => {
+  if (data.workCenterCode) {
+    const existingWorkCenter = await db.query.workCenterSchema.findFirst({
+      where: eq(workCenterSchema.workCenterCode, data.workCenterCode),
+    });
+
+    if (existingWorkCenter && existingWorkCenter.id !== id) {
+      throw new Error("Work center code already exists");
+    }
+  }
+
   return db
     .update(workCenterSchema)
     .set({ ...data, updatedAt: sql`now()` })

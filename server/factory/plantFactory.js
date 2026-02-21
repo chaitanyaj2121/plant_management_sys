@@ -64,10 +64,28 @@ const getPlantSelections = async () => {
 };
 
 const createPlant = async (data) => {
-  return await db.insert(plantSchema).values(data);
+  const existingPlant = await db.query.plantSchema.findFirst({
+    where: eq(plantSchema.plantCode, data.plantCode),
+  });
+
+  if (existingPlant) {
+    throw new Error("Plant code already exists");
+  }
+
+  return await db.insert(plantSchema).values(data).returning();
 };
 
 const updatePlant = async (id, data) => {
+  if (data.plantCode) {
+    const existingPlant = await db.query.plantSchema.findFirst({
+      where: eq(plantSchema.plantCode, data.plantCode),
+    });
+
+    if (existingPlant && existingPlant.id !== id) {
+      throw new Error("Plant code already exists");
+    }
+  }
+
   return await db
     .update(plantSchema)
     .set({ ...data, updatedAt: sql`now()` })

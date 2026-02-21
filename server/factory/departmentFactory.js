@@ -88,14 +88,33 @@ const getDepartmentSelections = async (plantId) => {
 };
 
 const createDepartment = async (data) => {
-  return db.insert(departmentSchema).values(data);
+  const existingDept = await db.query.departmentSchema.findFirst({
+    where: eq(departmentSchema.depCode, data.depCode),
+  });
+
+  if (existingDept) {
+    throw new Error("Department code already exists");
+  }
+
+  return db.insert(departmentSchema).values(data).returning();
 };
 
 const updateDepartment = async (id, data) => {
+  if (data.depCode) {
+    const existingDept = await db.query.departmentSchema.findFirst({
+      where: eq(departmentSchema.depCode, data.depCode),
+    });
+
+    if (existingDept && existingDept.id !== id) {
+      throw new Error("Department code already exists");
+    }
+  }
+
   return db
     .update(departmentSchema)
     .set({ ...data, updatedAt: sql`now()` })
-    .where(eq(departmentSchema.id, id));
+    .where(eq(departmentSchema.id, id))
+    .returning();
 };
 
 const deleteDepartment = async (id) => {
