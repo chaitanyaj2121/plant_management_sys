@@ -24,6 +24,7 @@ const WorkCenterSetup = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [popup, setPopup] = useState({
@@ -134,10 +135,12 @@ const WorkCenterSetup = () => {
     setForm((prev) => ({ ...prev, plantId, depId: "" }));
     setDepartments([]);
     departmentsLoadedForPlant.current = "";
+    setFieldErrors((prev) => ({ ...prev, plantId: undefined, depId: undefined }));
   };
 
   const onDepartmentChange = (depId) => {
     setForm((prev) => ({ ...prev, depId }));
+    setFieldErrors((prev) => ({ ...prev, depId: undefined }));
   };
 
   const onPlantDropdownFocus = () => {
@@ -151,15 +154,42 @@ const WorkCenterSetup = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    const errors = {};
+    if (!form.plantId) {
+      errors.plantId = "Plant is required";
+    }
+    if (!form.depId) {
+      errors.depId = "Department is required";
+    }
+    if (!form.workName.trim()) {
+      errors.workName = "Work center name is required";
+    }
+    const workCodeValue = form.workCode?.toString().trim();
+    if (!workCodeValue) {
+      errors.workCode = "Work center code is required";
+    } else if (!/^\d+$/.test(workCodeValue)) {
+      errors.workCode = "Work center code must contain only digits";
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     try {
+      const payload = {
+        ...form,
+        workName: form.workName.trim(),
+        workCode: workCodeValue,
+      };
       if (editingId) {
-        await api.put(`/work-centers/${editingId}`, form);
+        await api.put(`/work-centers/${editingId}`, payload);
       } else {
-        await api.post("/work-centers", form);
+        await api.post("/work-centers", payload);
       }
 
       setEditingId(null);
       setForm(defaultForm);
+      setFieldErrors({});
       setIsFormOpen(false);
       setPage(1);
       fetchWorkCenters(1, debouncedSearchTerm, limit);
@@ -186,6 +216,7 @@ const WorkCenterSetup = () => {
         workCode: selectedWorkCenter.workCode?.toString() || "",
         workDescription: selectedWorkCenter.workDescription || "",
       });
+      setFieldErrors({});
 
       if (selectedWorkCenter.plant) {
         setPlants([selectedWorkCenter.plant]);
@@ -211,12 +242,14 @@ const WorkCenterSetup = () => {
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(false);
   };
 
@@ -285,7 +318,7 @@ const WorkCenterSetup = () => {
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
-            <form onSubmit={onSubmit} className="flex flex-col gap-5">
+            <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
               <p className="text-xs text-gray-500">
                 <span className="text-red-500">*</span> Required fields
               </p>
@@ -299,7 +332,6 @@ const WorkCenterSetup = () => {
                   value={form.plantId}
                   onMouseDown={onPlantDropdownFocus}
                   onChange={(e) => onPlantChange(e.target.value)}
-                  required
                 >
                   <option value="">Select Plant</option>
                   {plants.map((plant) => (
@@ -308,6 +340,9 @@ const WorkCenterSetup = () => {
                     </option>
                   ))}
                 </select>
+                {fieldErrors.plantId ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.plantId}</p>
+                ) : null}
               </div>
 
               <div>
@@ -319,7 +354,6 @@ const WorkCenterSetup = () => {
                   value={form.depId}
                   onMouseDown={onDepartmentDropdownFocus}
                   onChange={(e) => onDepartmentChange(e.target.value)}
-                  required
                   disabled={!form.plantId}
                 >
                   <option value="">Select Department</option>
@@ -329,6 +363,9 @@ const WorkCenterSetup = () => {
                     </option>
                   ))}
                 </select>
+                {fieldErrors.depId ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.depId}</p>
+                ) : null}
               </div>
 
               <div>
@@ -339,11 +376,16 @@ const WorkCenterSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Work Center Name"
                   value={form.workName}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, workName: e.target.value }))
-                  }
-                  required
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, workName: e.target.value }));
+                    if (fieldErrors.workName) {
+                      setFieldErrors((prev) => ({ ...prev, workName: undefined }));
+                    }
+                  }}
                 />
+                {fieldErrors.workName ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.workName}</p>
+                ) : null}
               </div>
 
               <div>
@@ -355,11 +397,16 @@ const WorkCenterSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Work Center Code"
                   value={form.workCode}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, workCode: e.target.value }))
-                  }
-                  required
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, workCode: e.target.value }));
+                    if (fieldErrors.workCode) {
+                      setFieldErrors((prev) => ({ ...prev, workCode: undefined }));
+                    }
+                  }}
                 />
+                {fieldErrors.workCode ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.workCode}</p>
+                ) : null}
               </div>
 
               <div>

@@ -16,6 +16,7 @@ const PlantSetup = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [form, setForm] = useState(defaultForm);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -78,18 +79,35 @@ const PlantSetup = () => {
 
   const onSubmit = async (event) => {
     event.preventDefault();
+    const errors = {};
+    if (!form.name.trim()) {
+      errors.name = "Plant name is required";
+    }
+    const codeValue = form.code?.toString().trim();
+    if (!codeValue) {
+      errors.code = "Plant code is required";
+    } else if (!/^\d+$/.test(codeValue)) {
+      errors.code = "Plant code must contain only digits";
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     try {
       setSubmitting(true);
+      const payload = {
+        name: form.name.trim(),
+        des: form.des,
+        code: codeValue,
+      };
       if (editingId) {
-        await api.put(`/plants/${editingId}`, {
-          name: form.name,
-          des: form.des,
-          code: form.code,
-        });
+        await api.put(`/plants/${editingId}`, payload);
       } else {
-        await api.post("/plants", form);
+        await api.post("/plants", payload);
       }
       setForm(defaultForm);
+      setFieldErrors({});
       setEditingId(null);
       setIsFormOpen(false);
       setPage(1);
@@ -117,6 +135,7 @@ const PlantSetup = () => {
         des: selectedPlant?.des || "",
         code: selectedPlant?.code || "",
       });
+      setFieldErrors({});
       setIsFormOpen(true);
     } catch (error) {
       openPopup({
@@ -132,12 +151,14 @@ const PlantSetup = () => {
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(false);
   };
 
@@ -213,7 +234,7 @@ const PlantSetup = () => {
               </h3>
             </div>
 
-            <form onSubmit={onSubmit} className="p-6 space-y-4">
+            <form onSubmit={onSubmit} className="p-6 space-y-4" noValidate>
               <p className="text-xs text-gray-500">
                 <span className="text-red-500">*</span> Required fields
               </p>
@@ -225,11 +246,16 @@ const PlantSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Enter plant name"
                   value={form.name}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  required
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, name: e.target.value }));
+                    if (fieldErrors.name) {
+                      setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                    }
+                  }}
                 />
+                {fieldErrors.name ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.name}</p>
+                ) : null}
               </div>
 
               <div>
@@ -255,11 +281,16 @@ const PlantSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Enter plant code"
                   value={form.code}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, code: e.target.value }))
-                  }
-                  required
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, code: e.target.value }));
+                    if (fieldErrors.code) {
+                      setFieldErrors((prev) => ({ ...prev, code: undefined }));
+                    }
+                  }}
                 />
+                {fieldErrors.code ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.code}</p>
+                ) : null}
               </div>
 
               <div className="flex justify-end gap-3 pt-2">

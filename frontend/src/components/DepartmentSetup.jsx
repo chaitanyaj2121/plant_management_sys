@@ -22,6 +22,7 @@ const DepartmentSetup = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState(defaultForm);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [editingId, setEditingId] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [popup, setPopup] = useState({
@@ -102,13 +103,37 @@ const DepartmentSetup = () => {
 
   const submitForm = async (event) => {
     event.preventDefault();
+    const errors = {};
+    if (!form.plantId) {
+      errors.plantId = "Plant is required";
+    }
+    if (!form.depName.trim()) {
+      errors.depName = "Department name is required";
+    }
+    const depCodeValue = form.depCode?.toString().trim();
+    if (!depCodeValue) {
+      errors.depCode = "Department code is required";
+    } else if (!/^\d+$/.test(depCodeValue)) {
+      errors.depCode = "Department code must contain only digits";
+    }
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     try {
+      const payload = {
+        ...form,
+        depName: form.depName.trim(),
+        depCode: depCodeValue,
+      };
       if (editingId) {
-        await api.put(`/departments/${editingId}`, form);
+        await api.put(`/departments/${editingId}`, payload);
       } else {
-        await api.post("/departments", form);
+        await api.post("/departments", payload);
       }
       setForm(defaultForm);
+      setFieldErrors({});
       setEditingId(null);
       setIsFormOpen(false);
       setPage(1);
@@ -134,6 +159,7 @@ const DepartmentSetup = () => {
         depCode: selectedDepartment.depCode?.toString() || "",
         depDescription: selectedDepartment.depDescription || "",
       });
+      setFieldErrors({});
 
       if (selectedDepartment.plant) {
         setPlants([selectedDepartment.plant]);
@@ -155,12 +181,14 @@ const DepartmentSetup = () => {
   const onAdd = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(true);
   };
 
   const onCloseForm = () => {
     setEditingId(null);
     setForm(defaultForm);
+    setFieldErrors({});
     setIsFormOpen(false);
   };
 
@@ -229,7 +257,7 @@ const DepartmentSetup = () => {
       {isFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
           <div className="w-full max-w-2xl rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
-            <form onSubmit={submitForm} className="flex flex-col gap-5">
+            <form onSubmit={submitForm} className="flex flex-col gap-5" noValidate>
               <p className="text-xs text-gray-500">
                 <span className="text-red-500">*</span> Required fields
               </p>
@@ -242,10 +270,12 @@ const DepartmentSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   value={form.plantId}
                   onMouseDown={() => fetchPlants(true)}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, plantId: e.target.value }))
-                  }
-                  required
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, plantId: e.target.value }));
+                    if (fieldErrors.plantId) {
+                      setFieldErrors((prev) => ({ ...prev, plantId: undefined }));
+                    }
+                  }}
                 >
                   <option value="">Select Plant</option>
                   {plants.map((plant) => (
@@ -254,6 +284,9 @@ const DepartmentSetup = () => {
                     </option>
                   ))}
                 </select>
+                {fieldErrors.plantId ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.plantId}</p>
+                ) : null}
               </div>
 
               <div>
@@ -264,11 +297,16 @@ const DepartmentSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Department Name"
                   value={form.depName}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, depName: e.target.value }))
-                  }
-                  required
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, depName: e.target.value }));
+                    if (fieldErrors.depName) {
+                      setFieldErrors((prev) => ({ ...prev, depName: undefined }));
+                    }
+                  }}
                 />
+                {fieldErrors.depName ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.depName}</p>
+                ) : null}
               </div>
 
               <div>
@@ -280,11 +318,16 @@ const DepartmentSetup = () => {
                   className="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
                   placeholder="Department Code"
                   value={form.depCode}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, depCode: e.target.value }))
-                  }
-                  required
+                  onChange={(e) => {
+                    setForm((prev) => ({ ...prev, depCode: e.target.value }));
+                    if (fieldErrors.depCode) {
+                      setFieldErrors((prev) => ({ ...prev, depCode: undefined }));
+                    }
+                  }}
                 />
+                {fieldErrors.depCode ? (
+                  <p className="mt-1 text-xs text-red-600">{fieldErrors.depCode}</p>
+                ) : null}
               </div>
 
               <div>
