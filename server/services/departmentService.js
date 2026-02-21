@@ -8,7 +8,7 @@ const {
 const getDepartments = async (query) => {
   const { page, limit, offset } = parsePagination(query);
   const filters = {
-    plantId: query.plantId,
+    plantId: query.plantId ? Number(query.plantId) : undefined,
     search: query.search,
   };
 
@@ -22,7 +22,8 @@ const getDepartments = async (query) => {
 };
 
 const getDepartmentSelections = async (query) => {
-  const departments = await departmentFactory.getDepartmentSelections(query.plantId);
+  const plantId = query.plantId ? Number(query.plantId) : undefined;
+  const departments = await departmentFactory.getDepartmentSelections(plantId);
   return { departments };
 };
 
@@ -42,13 +43,14 @@ const createDepartment = async (body) => {
     throw new Error("plantId and depName are required");
   }
 
-  const plant = await plantFactory.getPlantById(body.plantId);
+  const plantId = Number(body.plantId);
+  const plant = await plantFactory.getPlantById(plantId);
   if (!plant) {
     throw new Error("Plant not found");
   }
 
   return departmentFactory.createDepartment({
-    plantId: body.plantId,
+    plantId,
     depName: body.depName,
     depCode: body.depCode || null,
     depDescription: body.depDescription || null,
@@ -63,13 +65,18 @@ const updateDepartment = async (id, body) => {
   }
 
   if (body.plantId) {
-    const plant = await plantFactory.getPlantById(body.plantId);
+    const plant = await plantFactory.getPlantById(Number(body.plantId));
     if (!plant) {
       throw new Error("Plant not found");
     }
   }
 
-  return departmentFactory.updateDepartment(departmentId, body);
+  const payload = { ...body };
+  if (payload.plantId) {
+    payload.plantId = Number(payload.plantId);
+  }
+
+  return departmentFactory.updateDepartment(departmentId, payload);
 };
 
 const deleteDepartment = async (id) => {

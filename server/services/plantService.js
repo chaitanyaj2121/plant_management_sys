@@ -1,4 +1,3 @@
-const { v4: uuidv4 } = require("uuid");
 const plantFactory = require("../factory/plantFactory");
 const {
   parsePagination,
@@ -28,7 +27,8 @@ const getPlantSelections = async () => {
 };
 
 const getPlantById = async (id) => {
-  const plant = await plantFactory.getPlantById(id);
+  const plantId = Number(id);
+  const plant = await plantFactory.getPlantById(plantId);
   if (!plant) {
     throw new Error("Plant not found");
   }
@@ -41,7 +41,6 @@ const createPlant = async (body) => {
   }
 
   const plantData = {
-    id: uuidv4(),
     name: body.name,
     des: body.des || "",
     code: body.code,
@@ -51,11 +50,23 @@ const createPlant = async (body) => {
 };
 
 const updatePlant = async (id, body) => {
-  return await plantFactory.updatePlant(id, body);
+  const plantId = Number(id);
+  const existingPlant = await plantFactory.getPlantById(plantId);
+  if (!existingPlant) {
+    throw new Error("Plant not found");
+  }
+
+  return await plantFactory.updatePlant(plantId, body);
 };
 
 const deletePlant = async (id) => {
-  return await plantFactory.deletePlant(id);
+  const plantId = Number(id);
+  const existingPlant = await plantFactory.getPlantById(plantId);
+  if (!existingPlant) {
+    throw new Error("Plant not found");
+  }
+
+  return await plantFactory.deletePlant(plantId);
 };
 
 module.exports = {

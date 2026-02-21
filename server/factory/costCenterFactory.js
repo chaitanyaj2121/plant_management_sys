@@ -1,10 +1,6 @@
 const { and, desc, eq, ilike, inArray, or, sql } = require("drizzle-orm");
 const db = require("../db/connect_db");
-const {
-  costCenterSchema,
-  plantSchema,
-  workCenterSchema,
-} = require("../models/Schema");
+const { costCenterSchema, plantSchema } = require("../models/Schema");
 
 const buildCostCenterWhere = (filters = {}) => {
   const conditions = [];
@@ -48,7 +44,7 @@ const getCostCenters = async (limit, offset, filters = {}) => {
     with: {
       plant: true,
       department: true,
-      workCenters: true,
+      workCenter: true,
     },
     orderBy: [
       desc(costCenterSchema.updatedAt),
@@ -77,7 +73,7 @@ const getCostCenterById = async (id) => {
       with: {
         plant: true,
         department: true,
-        workCenters: true,
+        workCenter: true,
       },
     })) || null
   );

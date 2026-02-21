@@ -1,5 +1,22 @@
 const costCenterService = require("../services/costCenterService");
 
+const getCostCenterWriteErrorMessage = (err) => {
+  if (err?.code !== "23505") {
+    return err.message;
+  }
+
+  const constraint = (err.constraint || "").toLowerCase();
+  const detail = (err.detail || "").toLowerCase();
+  if (
+    constraint.includes("cost_center_code") ||
+    detail.includes("(cost_center_code)")
+  ) {
+    return "Cost center code already exists";
+  }
+
+  return "Duplicate value already exists";
+};
+
 const getCostCenters = async (req, res) => {
   try {
     const result = await costCenterService.getCostCenters(req.query);
@@ -30,7 +47,7 @@ const createCostCenter = async (req, res) => {
       costCenterId: createdCostCenter.id,
     });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getCostCenterWriteErrorMessage(err) });
   }
 };
 
@@ -40,7 +57,7 @@ const updateCostCenter = async (req, res) => {
     await costCenterService.updateCostCenter(id, req.body);
     return res.status(200).json({ message: "Cost center updated successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getCostCenterWriteErrorMessage(err) });
   }
 };
 

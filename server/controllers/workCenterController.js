@@ -1,5 +1,19 @@
 const workCenterService = require("../services/workCenterService");
 
+const getWorkCenterWriteErrorMessage = (err) => {
+  if (err?.code !== "23505") {
+    return err.message;
+  }
+
+  const constraint = (err.constraint || "").toLowerCase();
+  const detail = (err.detail || "").toLowerCase();
+  if (constraint.includes("work_code") || detail.includes("(work_code)")) {
+    return "Work center code already exists";
+  }
+
+  return "Duplicate value already exists";
+};
+
 const getWorkCenters = async (req, res) => {
   try {
     const result = await workCenterService.getWorkCenters(req.query);
@@ -34,7 +48,7 @@ const createWorkCenter = async (req, res) => {
     await workCenterService.createWorkCenter(req.body);
     res.status(201).json({ message: "Work center added successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getWorkCenterWriteErrorMessage(err) });
   }
 };
 
@@ -44,7 +58,7 @@ const updateWorkCenter = async (req, res) => {
     await workCenterService.updateWorkCenter(id, req.body);
     res.status(200).json({ message: "Work center updated successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getWorkCenterWriteErrorMessage(err) });
   }
 };
 

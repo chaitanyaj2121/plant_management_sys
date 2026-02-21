@@ -10,9 +10,6 @@ const buildWorkCenterWhere = (filters = {}) => {
   if (filters.depId) {
     conditions.push(eq(workCenterSchema.depId, filters.depId));
   }
-  if (filters.costCenterId) {
-    conditions.push(eq(workCenterSchema.costCenterId, filters.costCenterId));
-  }
   const search = filters.search?.trim();
   if (search) {
     const pattern = `%${search}%`;
@@ -47,7 +44,7 @@ const getWorkCenters = async (limit, offset, filters = {}) => {
     with: {
       plant: true,
       department: true,
-      costCenter: true,
+      costCenters: true,
     },
     orderBy: [
       desc(workCenterSchema.updatedAt),
@@ -76,7 +73,7 @@ const getWorkCenterById = async (id) => {
       with: {
         plant: true,
         department: true,
-        costCenter: true,
+        costCenters: true,
       },
     })) || null
   );

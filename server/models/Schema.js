@@ -3,7 +3,6 @@ const {
   integer,
   pgTable,
   varchar,
-  uuid,
   serial,
   text,
   timestamp,
@@ -11,10 +10,10 @@ const {
 const { relations } = require("drizzle-orm");
 
 const plantSchema = pgTable("plant", {
-  id: uuid("id").primaryKey(),
+  id: serial("id").primaryKey(),
   name: varchar("name").notNull(),
   des: varchar("des").notNull(),
-  code: numeric("code").notNull(),
+  code: numeric("code").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -32,11 +31,11 @@ const userSchema = pgTable("user", {
 // Department table
 const departmentSchema = pgTable("department", {
   id: serial("id").primaryKey(),
-  plantId: uuid("plant_id").references(() => plantSchema.id, {
+  plantId: integer("plant_id").references(() => plantSchema.id, {
     onDelete: "cascade",
   }),
   depName: varchar("dep_name", { length: 255 }).notNull(),
-  depCode: varchar("dep_code", { length: 255 }).unique(),
+  depCode: numeric("dep_code").unique(),
   depDescription: text("dep_description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -45,14 +44,15 @@ const departmentSchema = pgTable("department", {
 // CostCenter table
 const costCenterSchema = pgTable("cost_center", {
   id: serial("id").primaryKey(),
-  plantId: uuid("plant_id").references(() => plantSchema.id, {
+  plantId: integer("plant_id").references(() => plantSchema.id, {
     onDelete: "cascade",
   }),
   depId: integer("dep_id").references(() => departmentSchema.id, {
     onDelete: "cascade",
   }),
+  workCenterId: integer("work_center_id"),
   costCenterName: varchar("cost_center_name", { length: 255 }).notNull(),
-  costCenterCode: varchar("cost_center_code", { length: 255 }).unique(),
+  costCenterCode: numeric("cost_center_code").unique(),
   description: text("description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -61,20 +61,14 @@ const costCenterSchema = pgTable("cost_center", {
 // WorkCenter table
 const workCenterSchema = pgTable("work_center", {
   id: serial("id").primaryKey(),
-  plantId: uuid("plant_id").references(() => plantSchema.id, {
+  plantId: integer("plant_id").references(() => plantSchema.id, {
     onDelete: "cascade",
   }),
   depId: integer("dep_id").references(() => departmentSchema.id, {
     onDelete: "cascade",
   }),
-  costCenterId: integer("cost_center_id").references(
-    () => costCenterSchema.id,
-    {
-      onDelete: "set null",
-    },
-  ),
   workName: varchar("work_name", { length: 255 }).notNull(),
-  workCode: varchar("work_code", { length: 255 }).unique(),
+  workCode: numeric("work_code").unique(),
   workDescription: text("work_description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -105,10 +99,13 @@ const costCenterRelations = relations(costCenterSchema, ({ one, many }) => ({
     fields: [costCenterSchema.depId],
     references: [departmentSchema.id],
   }),
-  workCenters: many(workCenterSchema),
+  workCenter: one(workCenterSchema, {
+    fields: [costCenterSchema.workCenterId],
+    references: [workCenterSchema.id],
+  }),
 }));
 
-const workCenterRelations = relations(workCenterSchema, ({ one }) => ({
+const workCenterRelations = relations(workCenterSchema, ({ one, many }) => ({
   plant: one(plantSchema, {
     fields: [workCenterSchema.plantId],
     references: [plantSchema.id],
@@ -117,10 +114,7 @@ const workCenterRelations = relations(workCenterSchema, ({ one }) => ({
     fields: [workCenterSchema.depId],
     references: [departmentSchema.id],
   }),
-  costCenter: one(costCenterSchema, {
-    fields: [workCenterSchema.costCenterId],
-    references: [costCenterSchema.id],
-  }),
+  costCenters: many(costCenterSchema),
 }));
 
 module.exports = {

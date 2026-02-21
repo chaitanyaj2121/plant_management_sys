@@ -1,5 +1,19 @@
 const departmentService = require("../services/departmentService");
 
+const getDepartmentWriteErrorMessage = (err) => {
+  if (err?.code !== "23505") {
+    return err.message;
+  }
+
+  const constraint = (err.constraint || "").toLowerCase();
+  const detail = (err.detail || "").toLowerCase();
+  if (constraint.includes("dep_code") || detail.includes("(dep_code)")) {
+    return "Department code already exists";
+  }
+
+  return "Duplicate value already exists";
+};
+
 const getDepartments = async (req, res) => {
   try {
     const result = await departmentService.getDepartments(req.query);
@@ -34,7 +48,7 @@ const createDepartment = async (req, res) => {
     await departmentService.createDepartment(req.body);
     res.status(201).json({ message: "Department added successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getDepartmentWriteErrorMessage(err) });
   }
 };
 
@@ -44,7 +58,7 @@ const updateDepartment = async (req, res) => {
     await departmentService.updateDepartment(id, req.body);
     res.status(200).json({ message: "Department updated successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getDepartmentWriteErrorMessage(err) });
   }
 };
 

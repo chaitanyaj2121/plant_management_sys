@@ -1,5 +1,19 @@
 const plantService = require("../services/plantService");
 
+const getPlantWriteErrorMessage = (err) => {
+  if (err?.code !== "23505") {
+    return err.message;
+  }
+
+  const constraint = (err.constraint || "").toLowerCase();
+  const detail = (err.detail || "").toLowerCase();
+  if (constraint.includes("code") || detail.includes("(code)")) {
+    return "Plant code already exists";
+  }
+
+  return "Duplicate value already exists";
+};
+
 const getPlants = async (req, res) => {
   try {
     const result = await plantService.getPlants(req.query);
@@ -35,7 +49,7 @@ const createPlant = async (req, res) => {
     await plantService.createPlant(req.body);
     res.status(201).json({ message: "Plant added successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getPlantWriteErrorMessage(err) });
   }
 };
 
@@ -45,7 +59,7 @@ const updatePlant = async (req, res) => {
     await plantService.updatePlant(id, req.body);
     res.json({ message: "Plant updated successfully" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: getPlantWriteErrorMessage(err) });
   }
 };
 
