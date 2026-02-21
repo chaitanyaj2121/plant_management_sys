@@ -161,7 +161,8 @@ const WorkCenterSetup = () => {
       setEditingId(null);
       setForm(defaultForm);
       setIsFormOpen(false);
-      fetchWorkCenters(page, debouncedSearchTerm, limit);
+      setPage(1);
+      fetchWorkCenters(1, debouncedSearchTerm, limit);
     } catch (error) {
       openPopup({
         title: "Error",

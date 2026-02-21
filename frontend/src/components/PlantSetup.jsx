@@ -92,7 +92,8 @@ const PlantSetup = () => {
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
-      fetchPlants(page, debouncedSearchTerm, limit);
+      setPage(1);
+      fetchPlants(1, debouncedSearchTerm, limit);
     } catch (error) {
       openPopup({
         title: "Error",

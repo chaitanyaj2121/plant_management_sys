@@ -133,7 +133,7 @@ const assignWorkCentersDirect = async (workCenterIds, costCenterId) => {
 
   await db
     .update(workCenterSchema)
-    .set({ costCenterId })
+    .set({ costCenterId, updatedAt: new Date() })
     .where(inArray(workCenterSchema.id, workCenterIds));
 };
 
@@ -152,7 +152,7 @@ const clearRemovedWorkCentersDirect = async (costCenterId, keepIds = []) => {
 
   await db
     .update(workCenterSchema)
-    .set({ costCenterId: null })
+    .set({ costCenterId: null, updatedAt: new Date() })
     .where(inArray(workCenterSchema.id, toClear));
 };
 

@@ -1,4 +1,4 @@
-const { and, eq, ilike, inArray, or, sql } = require("drizzle-orm");
+const { and, desc, eq, ilike, inArray, or, sql } = require("drizzle-orm");
 const db = require("../db/connect_db");
 const { departmentSchema, plantSchema } = require("../models/Schema");
 
@@ -45,6 +45,11 @@ const getDepartments = async (limit, offset, filters = {}) => {
     with: {
       plant: true,
     },
+    orderBy: [
+      desc(departmentSchema.updatedAt),
+      desc(departmentSchema.createdAt),
+      desc(departmentSchema.id),
+    ],
     limit,
     offset,
   });
@@ -89,7 +94,7 @@ const createDepartment = async (data) => {
 const updateDepartment = async (id, data) => {
   return db
     .update(departmentSchema)
-    .set(data)
+    .set({ ...data, updatedAt: new Date() })
     .where(eq(departmentSchema.id, id));
 };
 

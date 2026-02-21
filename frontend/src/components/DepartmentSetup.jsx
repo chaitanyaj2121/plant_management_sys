@@ -111,7 +111,8 @@ const DepartmentSetup = () => {
       setForm(defaultForm);
       setEditingId(null);
       setIsFormOpen(false);
-      fetchDepartments(page, debouncedSearchTerm, limit);
+      setPage(1);
+      fetchDepartments(1, debouncedSearchTerm, limit);
     } catch (error) {
       openPopup({
         title: "Error",

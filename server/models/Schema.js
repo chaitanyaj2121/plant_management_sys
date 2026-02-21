@@ -15,6 +15,8 @@ const plantSchema = pgTable("plant", {
   name: varchar("name").notNull(),
   des: varchar("des").notNull(),
   code: numeric("code").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // User table for authentication
@@ -36,6 +38,8 @@ const departmentSchema = pgTable("department", {
   depName: varchar("dep_name", { length: 255 }).notNull(),
   depCode: varchar("dep_code", { length: 255 }).unique(),
   depDescription: text("dep_description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // CostCenter table
@@ -50,6 +54,8 @@ const costCenterSchema = pgTable("cost_center", {
   costCenterName: varchar("cost_center_name", { length: 255 }).notNull(),
   costCenterCode: varchar("cost_center_code", { length: 255 }).unique(),
   description: text("description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // WorkCenter table
@@ -70,6 +76,8 @@ const workCenterSchema = pgTable("work_center", {
   workName: varchar("work_name", { length: 255 }).notNull(),
   workCode: varchar("work_code", { length: 255 }).unique(),
   workDescription: text("work_description"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Relations

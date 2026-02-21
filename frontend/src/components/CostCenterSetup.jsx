@@ -207,7 +207,8 @@ const CostCenterSetup = () => {
       setEditingId(null);
       setForm(defaultForm);
       setIsFormOpen(false);
-      fetchCostCenters(page, debouncedSearchTerm, limit);
+      setPage(1);
+      fetchCostCenters(1, debouncedSearchTerm, limit);
     } catch (error) {
       openPopup({
         title: "Error",

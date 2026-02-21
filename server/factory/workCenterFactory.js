@@ -1,4 +1,4 @@
-const { and, eq, ilike, inArray, or, sql } = require("drizzle-orm");
+const { and, desc, eq, ilike, inArray, or, sql } = require("drizzle-orm");
 const db = require("../db/connect_db");
 const { plantSchema, workCenterSchema } = require("../models/Schema");
 
@@ -49,6 +49,11 @@ const getWorkCenters = async (limit, offset, filters = {}) => {
       department: true,
       costCenter: true,
     },
+    orderBy: [
+      desc(workCenterSchema.updatedAt),
+      desc(workCenterSchema.createdAt),
+      desc(workCenterSchema.id),
+    ],
     limit,
     offset,
   });
@@ -84,7 +89,7 @@ const createWorkCenter = async (data) => {
 const updateWorkCenter = async (id, data) => {
   return db
     .update(workCenterSchema)
-    .set(data)
+    .set({ ...data, updatedAt: new Date() })
     .where(eq(workCenterSchema.id, id));
 };
 

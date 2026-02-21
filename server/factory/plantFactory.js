@@ -1,6 +1,6 @@
 const db = require("../db/connect_db");
 const { plantSchema } = require("../models/Schema");
-const { and, eq, ilike, or, sql } = require("drizzle-orm");
+const { and, desc, eq, ilike, or, sql } = require("drizzle-orm");
 
 const buildPlantWhere = (filters = {}) => {
   const conditions = [];
@@ -26,6 +26,11 @@ const buildPlantWhere = (filters = {}) => {
 const getAllPlants = async (limit, offset, filters = {}) => {
   return await db.query.plantSchema.findMany({
     where: buildPlantWhere(filters),
+    orderBy: [
+      desc(plantSchema.updatedAt),
+      desc(plantSchema.createdAt),
+      desc(plantSchema.id),
+    ],
     limit,
     offset,
   });
@@ -63,7 +68,10 @@ const createPlant = async (data) => {
 };
 
 const updatePlant = async (id, data) => {
-  return await db.update(plantSchema).set(data).where(eq(plantSchema.id, id));
+  return await db
+    .update(plantSchema)
+    .set({ ...data, updatedAt: new Date() })
+    .where(eq(plantSchema.id, id));
 };
 
 const deletePlant = async (id) => {
