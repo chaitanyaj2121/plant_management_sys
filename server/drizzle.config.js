@@ -4,6 +4,6 @@ module.exports = {
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
-    url: "postgresql://postgres:password@localhost:5432/plat_info_db",
+    url: "postgresql://postgres:Devanta@123@localhost:5432/plat_info_db",
   },
 };
